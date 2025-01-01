@@ -55,8 +55,7 @@ const guardinValidationSchema = z.object({
   motherContactNo: z
     .string()
     .min(14, { message: 'contact number can`t be less than 14 character' })
-    .max(14, { message: 'contact number can`t be more that 14 character' })
-    .optional(),
+    .max(14, { message: 'contact number can`t be more that 14 character' }),
 });
 
 const localGuardianValidationSchema = z.object({
