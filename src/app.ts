@@ -1,15 +1,23 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
-import { userRoute } from './modules/user/user.route';
+import globalErrorHandler from './middlewire/globalErrorHandler';
+import config from './config';
+import notFound from './middlewire/notFound';
+import router from './routes';
 
 const app: Application = express();
 app.use(express.json());
 app.use(cors());
 
-app.use('/api/users', userRoute);
+app.use('/api', router);
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello PH university!');
-});
+const test = (req: Request, res: Response) => {
+  const message = `PH university is running on port ${config.port}`;
+  res.send(message);
+};
 
+app.get('/', test);
+
+app.use(globalErrorHandler);
+app.use(notFound);
 export default app;

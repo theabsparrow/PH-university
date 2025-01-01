@@ -17,8 +17,7 @@ const createStudent = async (password: string, studentData: TStudent) => {
   }
 
   const student = await Student.create(studentData);
-  console.log(student);
-  //   return { user, student };
+  return { user, student };
 };
 
 export const userService = {
