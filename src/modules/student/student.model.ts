@@ -24,7 +24,7 @@ const userNameSchema = new Schema<TUserName>({
   },
 });
 
-const guradianSchema = new Schema<TGuardian>({
+const guardianSchema = new Schema<TGuardian>({
   fatherName: {
     type: String,
     trim: true,
@@ -109,19 +109,19 @@ const studentSchema = new Schema<TStudent>(
     email: {
       type: String,
       trim: true,
-      unique: true,
+      // unique: true,
       required: [true, 'email is required'],
     },
     contactNo: {
       type: String,
-      unique: true,
+      // unique: true,
       required: [true, 'contact no is required'],
     },
-    emergebcyContactNo: {
+    emergencyContactNo: {
       type: String,
       required: [true, 'contact no is required'],
     },
-    bloogGroup: {
+    bloodGroup: {
       type: String,
       enum: BloodGroup,
       required: [true, 'blood group is required'],
@@ -136,8 +136,8 @@ const studentSchema = new Schema<TStudent>(
       trim: true,
       required: [true, 'parmanent address is required'],
     },
-    guradian: {
-      type: guradianSchema,
+    guardian: {
+      type: guardianSchema,
       required: [true, 'gurardian information is required'],
     },
     localGuardian: {
@@ -147,6 +147,11 @@ const studentSchema = new Schema<TStudent>(
     profileImage: {
       type: String,
       trim: true,
+    },
+    admissionSemister: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicSemister',
+      required: [true, 'admission semister is required'],
     },
     isDeleted: {
       type: Boolean,

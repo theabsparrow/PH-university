@@ -42,12 +42,13 @@ export type TStudent = {
   dateOfBirth: string;
   email: string;
   contactNo: string;
-  emergebcyContactNo: string;
-  bloogGroup?: TBloodGroup;
+  emergencyContactNo: string;
+  bloodGroup?: TBloodGroup;
   presentAddress: string;
   parmanentAddress: string;
-  guradian: TGuardian;
+  guardian: TGuardian;
   localGuardian: TLocalGuardian;
   profileImage?: string;
+  admissionSemister: Types.ObjectId;
   isDeleted: boolean;
 };

@@ -71,7 +71,7 @@ const localGuardianValidationSchema = z.object({
     .string()
     .min(2, { message: 'occupation cna`t be less than 2 character' })
     .max(30, { message: 'occupation can`t be more than 30 character' }),
-  conatctNo: z
+  contactNo: z
     .string()
     .min(14, { message: 'contact number can`t be less than 14 character' })
     .max(14, { message: 'contact number can`t be more that 14 character' }),
@@ -96,6 +96,7 @@ const studentValidationSchema = z.object({
     parmanentAddress: z.string(),
     guardian: guardinValidationSchema,
     localGuardian: localGuardianValidationSchema,
+    admissionSemister: z.string(),
     profileImage: z.string().optional(),
   }),
 });

@@ -46,6 +46,7 @@ academicSemisterSchema.pre('save', async function (next) {
   }
   next();
 });
+
 export const AcademicSemister = model<TAcademicSemister>(
   'AcademicSemister',
   academicSemisterSchema
