@@ -5,6 +5,7 @@ import {
   TStudent,
   TUserName,
 } from './student.interface';
+import { BloodGroup, Gender } from './student.constant';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -98,7 +99,7 @@ const studentSchema = new Schema<TStudent>(
     },
     gender: {
       type: String,
-      enum: ['male', 'female', 'other'],
+      enum: Gender,
       required: [true, 'gender is required'],
     },
     dateOfBirth: {
@@ -122,7 +123,7 @@ const studentSchema = new Schema<TStudent>(
     },
     bloogGroup: {
       type: String,
-      enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+      enum: BloodGroup,
       required: [true, 'blood group is required'],
     },
     presentAddress: {

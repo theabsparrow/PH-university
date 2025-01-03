@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { BloodGroup, Gender } from './student.constant';
 
 const userNameValidationSchema = z.object({
   firstName: z
@@ -78,19 +79,27 @@ const localGuardianValidationSchema = z.object({
 });
 
 const studentValidationSchema = z.object({
-  id: z.string(),
-  name: userNameValidationSchema,
-  gender: z.enum(['male', 'female', 'other']),
-  dateOfBirth: z.string(),
-  email: z.string().email(),
-  contactNo: z.string(),
-  emergencyContactNo: z.string(),
-  bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
-  presentAddress: z.string(),
-  parmanentAddress: z.string(),
-  guardian: guardinValidationSchema,
-  localGuardian: localGuardianValidationSchema,
-  profileImage: z.string().optional(),
+  password: z
+    .string()
+    .min(6, { message: 'password must be at least 6 character' })
+    .max(20, { message: 'password can`t be more that 20 character' })
+    .optional(),
+  student: z.object({
+    name: userNameValidationSchema,
+    gender: z.enum([...Gender] as [string, ...string[]]),
+    dateOfBirth: z.string(),
+    email: z.string().email(),
+    contactNo: z.string(),
+    emergencyContactNo: z.string(),
+    bloodGroup: z.enum([...BloodGroup] as [string, ...string[]]),
+    presentAddress: z.string(),
+    parmanentAddress: z.string(),
+    guardian: guardinValidationSchema,
+    localGuardian: localGuardianValidationSchema,
+    profileImage: z.string().optional(),
+  }),
 });
 
-export default studentValidationSchema;
+export const studentValidation = {
+  studentValidationSchema,
+};

@@ -22,16 +22,28 @@ export type TLocalGuardian = {
   address: string;
 };
 
+export type TBloodGroup =
+  | 'A+'
+  | 'A-'
+  | 'B+'
+  | 'B-'
+  | 'AB+'
+  | 'AB-'
+  | 'O+'
+  | 'O-';
+
+export type TGender = 'male' | 'female' | 'other';
+
 export type TStudent = {
   id: string;
   user: Types.ObjectId;
   name: TUserName;
-  gender: 'male' | 'female' | 'other';
+  gender: TGender;
   dateOfBirth: string;
   email: string;
   contactNo: string;
   emergebcyContactNo: string;
-  bloogGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
+  bloogGroup?: TBloodGroup;
   presentAddress: string;
   parmanentAddress: string;
   guradian: TGuardian;
