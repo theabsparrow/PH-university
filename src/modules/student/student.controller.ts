@@ -13,7 +13,7 @@ const getAllStudent = catchAsync(
       success: true,
       statusCode: StatusCodes.OK,
       message: 'students are retrived successfully',
-      data: result,
+      data: result || 'no data found',
     });
   }
 );

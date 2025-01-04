@@ -18,7 +18,6 @@ const createStudent = async (password: string, payload: TStudent) => {
   if (!admissionSemister) {
     throw new Error('Admission semister does not found');
   }
-
   userData.id = await generateStudentID(admissionSemister);
 
   const user = await User.create(userData);

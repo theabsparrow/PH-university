@@ -39,7 +39,9 @@ const guardinValidationSchema = z.object({
     .min(2, { message: 'occupation cna`t be less than 2 character' })
     .max(30, { message: 'occupation can`t be more than 30 character' }),
   fatherContactNo: z
-    .string()
+    .string({
+      invalid_type_error: 'contact no must be string',
+    })
     .min(14, { message: 'contact number can`t be less than 14 character' })
     .max(14, { message: 'contact number can`t be more that 14 character' }),
   motherName: z
@@ -54,7 +56,9 @@ const guardinValidationSchema = z.object({
     .min(2, { message: 'occupation cna`t be less than 2 character' })
     .max(30, { message: 'occupation can`t be more than 30 character' }),
   motherContactNo: z
-    .string()
+    .string({
+      invalid_type_error: 'contact no must be string',
+    })
     .min(14, { message: 'contact number can`t be less than 14 character' })
     .max(14, { message: 'contact number can`t be more that 14 character' }),
 });
@@ -72,7 +76,9 @@ const localGuardianValidationSchema = z.object({
     .min(2, { message: 'occupation cna`t be less than 2 character' })
     .max(30, { message: 'occupation can`t be more than 30 character' }),
   contactNo: z
-    .string()
+    .string({
+      invalid_type_error: 'contact no must be string',
+    })
     .min(14, { message: 'contact number can`t be less than 14 character' })
     .max(14, { message: 'contact number can`t be more that 14 character' }),
   address: z.string(),
@@ -80,23 +86,33 @@ const localGuardianValidationSchema = z.object({
 
 const studentValidationSchema = z.object({
   password: z
-    .string()
+    .string({
+      invalid_type_error: 'password must be string',
+    })
     .min(6, { message: 'password must be at least 6 character' })
     .max(20, { message: 'password can`t be more that 20 character' })
     .optional(),
   student: z.object({
     name: userNameValidationSchema,
     gender: z.enum([...Gender] as [string, ...string[]]),
-    dateOfBirth: z.string(),
+    dateOfBirth: z.string({
+      invalid_type_error: 'date must be string',
+    }),
     email: z.string().email(),
-    contactNo: z.string(),
-    emergencyContactNo: z.string(),
+    contactNo: z.string({
+      invalid_type_error: 'contact no must be string',
+    }),
+    emergencyContactNo: z.string({
+      invalid_type_error: 'emergency contact no must be string',
+    }),
     bloodGroup: z.enum([...BloodGroup] as [string, ...string[]]),
     presentAddress: z.string(),
     parmanentAddress: z.string(),
     guardian: guardinValidationSchema,
     localGuardian: localGuardianValidationSchema,
-    admissionSemister: z.string(),
+    admissionSemister: z.string({
+      invalid_type_error: 'admission semister must be string',
+    }),
     profileImage: z.string().optional(),
   }),
 });

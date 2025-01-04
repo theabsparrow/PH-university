@@ -4,3 +4,5 @@ export type TResponse<T> = {
   message?: string;
   data: T;
 };
+
+export type Tquery = Record<string, unknown>;

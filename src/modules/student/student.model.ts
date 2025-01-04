@@ -163,4 +163,23 @@ const studentSchema = new Schema<TStudent>(
   }
 );
 
+studentSchema.pre('save', async function (next) {
+  const isEmailUsed = await Student.findOne({
+    email: this.email,
+  });
+  const isPhoneNumberExist = await Student.findOne({
+    contactNo: this.contactNo,
+  });
+  const isStudentIDexist = await Student.findOne({
+    id: this.id,
+  });
+  if (isEmailUsed) {
+    throw new Error('this email is already exist');
+  } else if (isPhoneNumberExist) {
+    throw new Error('this phone number is already exist');
+  } else if (isStudentIDexist) {
+    throw new Error('this student ID is already exist');
+  }
+  next();
+});
 export const Student = model<TStudent>('Student', studentSchema);

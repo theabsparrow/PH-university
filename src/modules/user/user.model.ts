@@ -46,7 +46,15 @@ userSchema.pre('save', async function (next) {
   );
   next();
 });
-
+userSchema.pre('save', async function (next) {
+  const isIDexist = await User.findOne({
+    id: this.id,
+  });
+  if (isIDexist) {
+    throw new Error('this Id is already exist');
+  }
+  next();
+});
 userSchema.post('save', function (data, next) {
   data.password = '';
   next();

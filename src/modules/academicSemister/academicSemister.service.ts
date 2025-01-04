@@ -17,6 +17,9 @@ const getAllAcademySemister = async () => {
 
 const getASingleAcademySemister = async (id: string) => {
   const result = await AcademicSemister.findById(id);
+  if (!result) {
+    throw new Error('this academic semister does not exist');
+  }
   return result;
 };
 
