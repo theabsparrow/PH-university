@@ -6,6 +6,8 @@ import {
   TUserName,
 } from './student.interface';
 import { BloodGroup, Gender } from './student.constant';
+// import AppError from '../../error/AppError';
+// import { StatusCodes } from 'http-status-codes';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -153,6 +155,11 @@ const studentSchema = new Schema<TStudent>(
       ref: 'AcademicSemister',
       required: [true, 'admission semister is required'],
     },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'academic department is required'],
+      ref: 'AcademicDepartment',
+    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -163,23 +170,29 @@ const studentSchema = new Schema<TStudent>(
   }
 );
 
-studentSchema.pre('save', async function (next) {
-  const isEmailUsed = await Student.findOne({
-    email: this.email,
-  });
-  const isPhoneNumberExist = await Student.findOne({
-    contactNo: this.contactNo,
-  });
-  const isStudentIDexist = await Student.findOne({
-    id: this.id,
-  });
-  if (isEmailUsed) {
-    throw new Error('this email is already exist');
-  } else if (isPhoneNumberExist) {
-    throw new Error('this phone number is already exist');
-  } else if (isStudentIDexist) {
-    throw new Error('this student ID is already exist');
-  }
-  next();
-});
+// studentSchema.pre('save', async function (next) {
+//   const isEmailUsed = await Student.findOne({
+//     email: this.email,
+//   });
+//   const isPhoneNumberExist = await Student.findOne({
+//     contactNo: this.contactNo,
+//   });
+//   const isStudentIDexist = await Student.findOne({
+//     id: this.id,
+//   });
+//   if (isEmailUsed) {
+//     throw new AppError(StatusCodes.CONFLICT, 'this email is already exist');
+//   } else if (isPhoneNumberExist) {
+//     throw new AppError(
+//       StatusCodes.CONFLICT,
+//       'this phone number is already exist'
+//     );
+//   } else if (isStudentIDexist) {
+//     throw new AppError(
+//       StatusCodes.CONFLICT,
+//       'this student ID is already exist'
+//     );
+//   }
+//   next();
+// });
 export const Student = model<TStudent>('Student', studentSchema);

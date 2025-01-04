@@ -1,3 +1,5 @@
+import { StatusCodes } from 'http-status-codes';
+import AppError from '../../error/AppError';
 import { TAcademicFaculty } from './academicFaculty.interface';
 import { AcademicFaculty } from './academicFaculty.Model';
 
@@ -14,7 +16,10 @@ const getAllAcademicFaculty = async () => {
 const getSingleAcademicFaculty = async (id: string) => {
   const result = await AcademicFaculty.findById(id);
   if (!result) {
-    throw new Error('This academy faculty does not exist');
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      'This academy faculty does not exist'
+    );
   }
   return result;
 };
@@ -25,7 +30,10 @@ const updateAcademicFaculty = async (
 ) => {
   const isAcademyFacultyExists = await AcademicFaculty.findById(id);
   if (!isAcademyFacultyExists) {
-    throw new Error('this academy faculty does not exist');
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      'this academy faculty does not exist'
+    );
   }
   const result = await AcademicFaculty.findOneAndUpdate({ _id: id }, payload, {
     new: true,

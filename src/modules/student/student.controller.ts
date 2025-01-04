@@ -33,7 +33,7 @@ const getASingleStudent = catchAsync(
 
 const deleteStudent = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.params.id;
+    const id = req.params.studentID;
     const result = await studentService.deleteStudent(id);
     sendResponse(res, {
       success: true,

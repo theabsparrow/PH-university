@@ -2,6 +2,8 @@ import { model, Schema } from 'mongoose';
 import { Tuser } from './user.interface';
 import bcrypt from 'bcrypt';
 import config from '../../config';
+import AppError from '../../error/AppError';
+import { StatusCodes } from 'http-status-codes';
 
 const userSchema = new Schema<Tuser>(
   {
@@ -51,7 +53,7 @@ userSchema.pre('save', async function (next) {
     id: this.id,
   });
   if (isIDexist) {
-    throw new Error('this Id is already exist');
+    throw new AppError(StatusCodes.CONFLICT, 'this Id is already exist');
   }
   next();
 });

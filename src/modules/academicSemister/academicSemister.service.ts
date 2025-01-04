@@ -1,3 +1,5 @@
+import { StatusCodes } from 'http-status-codes';
+import AppError from '../../error/AppError';
 import { academicSemisterNameCodeStructure } from './academicSemister.constant';
 import { TAcademicSemister } from './academicSemister.interface';
 import { AcademicSemister } from './academicSemister.model';
@@ -18,7 +20,10 @@ const getAllAcademySemister = async () => {
 const getASingleAcademySemister = async (id: string) => {
   const result = await AcademicSemister.findById(id);
   if (!result) {
-    throw new Error('this academic semister does not exist');
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      'this academic semister does not exist'
+    );
   }
   return result;
 };
@@ -32,12 +37,12 @@ const updateAcademicSemister = async (
     payload?.code &&
     academicSemisterNameCodeStructure[payload.name] !== payload.code
   ) {
-    throw new Error('Invalid semister code');
+    throw new AppError(StatusCodes.BAD_REQUEST, 'Invalid semister code');
   }
 
   const isSemisterExist = await AcademicSemister.findById(id);
   if (!isSemisterExist) {
-    throw new Error('this semister does not exist');
+    throw new AppError(StatusCodes.NOT_FOUND, 'this semister does not exist');
   }
 
   const { name, year } = payload;
@@ -57,7 +62,7 @@ const updateAcademicSemister = async (
   if (Object.keys(query).length) {
     const existingSemister = await AcademicSemister.findOne(query);
     if (existingSemister) {
-      throw new Error('This semister already exists');
+      throw new AppError(StatusCodes.CONFLICT, 'This semister already exists');
     }
   }
 

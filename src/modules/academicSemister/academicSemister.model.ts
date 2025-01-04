@@ -5,6 +5,8 @@ import {
   AcademicSmeisterName,
   Months,
 } from './academicSemister.constant';
+import AppError from '../../error/AppError';
+import { StatusCodes } from 'http-status-codes';
 
 const academicSemisterSchema = new Schema<TAcademicSemister>(
   {
@@ -42,7 +44,7 @@ academicSemisterSchema.pre('save', async function (next) {
     name: this.name,
   });
   if (isSemisterExist) {
-    throw new Error('this semister is already exists');
+    throw new AppError(StatusCodes.CONFLICT, 'this semister is already exists');
   }
   next();
 });

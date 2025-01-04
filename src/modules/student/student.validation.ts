@@ -113,6 +113,9 @@ const studentValidationSchema = z.object({
     admissionSemister: z.string({
       invalid_type_error: 'admission semister must be string',
     }),
+    academicDepartment: z.string({
+      invalid_type_error: 'academic department is required',
+    }),
     profileImage: z.string().optional(),
   }),
 });

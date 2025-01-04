@@ -1,6 +1,8 @@
 import { model, Schema } from 'mongoose';
 import { TAcademicDepartment } from './academicDepartment.interface';
 import { Tquery } from '../../interface';
+import AppError from '../../error/AppError';
+import { StatusCodes } from 'http-status-codes';
 
 const academicDepartmentSchema = new Schema<TAcademicDepartment>(
   {
@@ -25,7 +27,10 @@ academicDepartmentSchema.pre('save', async function (next) {
     name: this.name,
   });
   if (isDepartmentExist) {
-    throw new Error('This department is already exist');
+    throw new AppError(
+      StatusCodes.CONFLICT,
+      'This department is already exist'
+    );
   }
   next();
 });
@@ -38,12 +43,13 @@ academicDepartmentSchema.pre('findOneAndUpdate', async function (next) {
     if (name) {
       const isNameExist = await AcademicDepartment.findOne({ name });
       if (isNameExist) {
-        throw new Error('This name is already taken');
+        throw new AppError(StatusCodes.CONFLICT, 'This name is already taken');
       }
     }
   }
   next();
 });
+
 export const AcademicDepartment = model<TAcademicDepartment>(
   'AcademicDepartment',
   academicDepartmentSchema
