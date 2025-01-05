@@ -120,6 +120,140 @@ const studentValidationSchema = z.object({
   }),
 });
 
+const updateUserNameValidationSchema = z.object({
+  firstName: z
+    .string()
+    .min(1, { message: 'first name can`t be less than one character' })
+    .max(20, { message: 'first name can`t be more than 20 character' })
+    .refine((value) => /^[A-Z]/.test(value), {
+      message: 'first name must be start with a capital letter',
+    })
+    .optional(),
+  middleName: z
+    .string()
+    .min(1, { message: 'middle name can`t be less than one character' })
+    .max(20, { message: 'middle name can`t be more than 20 character' })
+    .refine((value) => /^[A-Z]/.test(value), {
+      message: 'middle name must be start with a capital letter',
+    })
+    .optional(),
+  lastName: z
+    .string()
+    .min(1, { message: 'last name can`t be less than one character' })
+    .max(20, { message: 'last name can`t be more than 20 character' })
+    .refine((value) => /^[A-Z]/.test(value), {
+      message: 'last name must be start with a capital letter',
+    })
+    .optional(),
+});
+
+const updateGuardinValidationSchema = z.object({
+  fatherName: z
+    .string()
+    .min(1, { message: 'father name can`t be less than one character' })
+    .max(20, { message: 'father name can`t be more than 20 character' })
+    .refine((value) => /^[A-Z]/.test(value), {
+      message: 'father name must be start with a capital letter',
+    })
+    .optional(),
+  fatherOccupation: z
+    .string()
+    .min(2, { message: 'occupation cna`t be less than 2 character' })
+    .max(30, { message: 'occupation can`t be more than 30 character' })
+    .optional(),
+  fatherContactNo: z
+    .string({
+      invalid_type_error: 'contact no must be string',
+    })
+    .min(14, { message: 'contact number can`t be less than 14 character' })
+    .max(14, { message: 'contact number can`t be more that 14 character' })
+    .optional(),
+  motherName: z
+    .string()
+    .min(1, { message: 'mother name can`t be less than one character' })
+    .max(20, { message: 'mother name can`t be more than 20 character' })
+    .refine((value) => /^[A-Z]/.test(value), {
+      message: 'mother name must be start with a capital letter',
+    })
+    .optional(),
+  motherOccupation: z
+    .string()
+    .min(2, { message: 'occupation cna`t be less than 2 character' })
+    .max(30, { message: 'occupation can`t be more than 30 character' })
+    .optional(),
+  motherContactNo: z
+    .string({
+      invalid_type_error: 'contact no must be string',
+    })
+    .min(14, { message: 'contact number can`t be less than 14 character' })
+    .max(14, { message: 'contact number can`t be more that 14 character' })
+    .optional(),
+});
+
+const updateLocalGuardianValidationSchema = z.object({
+  name: z
+    .string()
+    .min(1, { message: 'name can`t be less than one character' })
+    .max(20, { message: 'name can`t be more than 20 character' })
+    .refine((value) => /^[A-Z]/.test(value), {
+      message: 'name must be start with a capital letter',
+    })
+    .optional(),
+  occupation: z
+    .string()
+    .min(2, { message: 'occupation cna`t be less than 2 character' })
+    .max(30, { message: 'occupation can`t be more than 30 character' })
+    .optional(),
+  contactNo: z
+    .string({
+      invalid_type_error: 'contact no must be string',
+    })
+    .min(14, { message: 'contact number can`t be less than 14 character' })
+    .max(14, { message: 'contact number can`t be more that 14 character' })
+    .optional(),
+  address: z.string().optional(),
+});
+
+const updateStudentValidationSchema = z.object({
+  student: z.object({
+    name: updateUserNameValidationSchema.optional(),
+    gender: z.enum([...Gender] as [string, ...string[]]).optional(),
+    dateOfBirth: z
+      .string({
+        invalid_type_error: 'date must be string',
+      })
+      .optional(),
+    email: z.string().email().optional(),
+    contactNo: z
+      .string({
+        invalid_type_error: 'contact no must be string',
+      })
+      .optional(),
+    emergencyContactNo: z
+      .string({
+        invalid_type_error: 'emergency contact no must be string',
+      })
+      .optional(),
+    bloodGroup: z.enum([...BloodGroup] as [string, ...string[]]).optional(),
+    presentAddress: z.string().optional(),
+    parmanentAddress: z.string().optional(),
+    guardian: updateGuardinValidationSchema.optional(),
+    localGuardian: updateLocalGuardianValidationSchema.optional(),
+    admissionSemister: z
+      .string({
+        invalid_type_error: 'admission semister must be string',
+      })
+      .optional(),
+    academicDepartment: z
+      .string({
+        invalid_type_error: 'academic department is required',
+      })
+      .optional(),
+    profileImage: z.string().optional().optional(),
+  }),
+});
+
 export const studentValidation = {
   studentValidationSchema,
+  updateStudentValidationSchema,
 };
