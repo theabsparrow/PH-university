@@ -69,7 +69,18 @@ const getAllStudent = async (query: Record<string, unknown>) => {
   // }
   // const fieldQuery = await limitQuery.select(fields);
 
-  const studentQuery = new QueryBuilder(Student.find(), query)
+  const studentQuery = new QueryBuilder(
+    Student.find()
+      .populate('user')
+      .populate('admissionSemister')
+      .populate({
+        path: 'academicDepartment',
+        populate: {
+          path: 'academicFaculty',
+        },
+      }),
+    query
+  )
     .search(studentSearchAbleFields)
     .filter()
     .sort()
