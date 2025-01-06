@@ -1,21 +1,63 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { StatusCodes } from 'http-status-codes';
 import AppError from '../../error/AppError';
 import { Student } from './student.model';
 import mongoose from 'mongoose';
 import { User } from '../user/user.model';
 import { TStudent } from './student.interface';
+import { studentSearchAbleFields } from './student.constant';
 
-const getAllStudent = async () => {
-  const result = await Student.find()
-    .populate('user')
-    .populate('admissionSemister')
-    .populate({
-      path: 'academicDepartment',
-      populate: {
-        path: 'academicFaculty',
-      },
-    });
-  return result;
+const getAllStudent = async (query: Record<string, unknown>) => {
+  const queryObject = { ...query };
+  let searchTerm = '';
+  if (query?.searchTerm) {
+    searchTerm = query?.searchTerm as string;
+  }
+
+  const searchQUery = Student.find({
+    $or: studentSearchAbleFields.map((field) => ({
+      [field]: { $regex: searchTerm, $options: 'i' },
+    })),
+  });
+
+  const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
+  excludeFields.forEach((element) => delete queryObject[element]);
+
+  const filterQuery = searchQUery.find(queryObject);
+  // .populate('user')
+  // .populate('admissionSemister')
+  // .populate({
+  //   path: 'academicDepartment',
+  //   populate: {
+  //     path: 'academicFaculty',
+  //   },
+  // });
+
+  let sort = '-createdAt';
+  if (query?.sort) {
+    sort = query?.sort as string;
+  }
+  const sortQuery = filterQuery.sort(sort);
+
+  let limit = 0;
+  let page = 1;
+  let skip = 0;
+  if (query?.limit) {
+    limit = Number(query?.limit);
+  }
+  if (query?.page) {
+    page = Number(query?.page);
+    skip = (page - 1) * limit;
+  }
+  const paginateQuery = sortQuery.skip(skip);
+  const limitQuery = paginateQuery.limit(limit);
+
+  let fields = '-_v';
+  if (query?.fields) {
+    fields = (query?.fields as string).split(',').join(' ');
+  }
+  const fieldQuery = await limitQuery.select(fields);
+  return fieldQuery;
 };
 
 const getSingleStudent = async (id: string) => {
@@ -69,11 +111,10 @@ const deleteStudent = async (id: string) => {
     await session.commitTransaction();
     await session.endSession();
     return deletedStudent;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-  } catch (err) {
+  } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
-    throw new Error('faild to delete student');
+    throw new Error(err);
   }
 };
 

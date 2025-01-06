@@ -8,7 +8,8 @@ import sendResponse from '../../utills/sendResponse';
 
 const getAllStudent = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const result = await studentService.getAllStudent();
+    const query = req.query;
+    const result = await studentService.getAllStudent(query);
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { StatusCodes } from 'http-status-codes';
 import config from '../../config';
 import AppError from '../../error/AppError';
@@ -46,11 +47,10 @@ const createStudent = async (password: string, payload: TStudent) => {
     await session.endSession();
 
     return student;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-  } catch (err) {
+  } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
-    throw new Error('faild to create student');
+    throw new Error(err);
   }
 };
 

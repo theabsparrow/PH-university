@@ -12,3 +12,10 @@ export const BloodGroup: TBloodGroup[] = [
 ];
 
 export const Gender: TGender[] = ['male', 'female', 'other'];
+
+type TStudentSearchableFields = string[];
+export const studentSearchAbleFields: TStudentSearchableFields = [
+  'email',
+  'name.firstName',
+  'presentAddress',
+];
