@@ -10,7 +10,7 @@ const adminValidationSchema = z.object({
     .min(6, { message: 'password must be at least 6 character' })
     .max(20, { message: 'password can`t be more that 20 character' })
     .optional(),
-  faculty: z.object({
+  admin: z.object({
     name: userNameValidationSchema,
     designation: z
       .string()

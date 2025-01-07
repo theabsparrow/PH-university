@@ -118,13 +118,15 @@ const createAdmin = async (password: string, payload: TAdmin) => {
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id;
 
-    const newFAculty = await Admin.create([payload], { session });
-    if (!newFAculty.length) {
+    const newAdmin = await Admin.create([payload], { session });
+    if (!newAdmin.length) {
       throw new AppError(StatusCodes.BAD_REQUEST, 'faild to create students');
     }
 
     await session.commitTransaction();
     await session.endSession();
+
+    return newAdmin;
   } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
