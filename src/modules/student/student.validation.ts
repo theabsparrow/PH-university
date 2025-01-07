@@ -1,30 +1,9 @@
 import { z } from 'zod';
-import { BloodGroup, Gender } from './student.constant';
-
-const userNameValidationSchema = z.object({
-  firstName: z
-    .string()
-    .min(1, { message: 'first name can`t be less than one character' })
-    .max(20, { message: 'first name can`t be more than 20 character' })
-    .refine((value) => /^[A-Z]/.test(value), {
-      message: 'first name must be start with a capital letter',
-    }),
-  middleName: z
-    .string()
-    .min(1, { message: 'middle name can`t be less than one character' })
-    .max(20, { message: 'middle name can`t be more than 20 character' })
-    .refine((value) => /^[A-Z]/.test(value), {
-      message: 'middle name must be start with a capital letter',
-    })
-    .optional(),
-  lastName: z
-    .string()
-    .min(1, { message: 'last name can`t be less than one character' })
-    .max(20, { message: 'last name can`t be more than 20 character' })
-    .refine((value) => /^[A-Z]/.test(value), {
-      message: 'last name must be start with a capital letter',
-    }),
-});
+import { BloodGroup, Gender } from '../../global/constant';
+import {
+  updateUserNameValidationSchema,
+  userNameValidationSchema,
+} from '../../global/validation';
 
 const guardinValidationSchema = z.object({
   fatherName: z
@@ -99,12 +78,18 @@ const studentValidationSchema = z.object({
       invalid_type_error: 'date must be string',
     }),
     email: z.string().email(),
-    contactNo: z.string({
-      invalid_type_error: 'contact no must be string',
-    }),
-    emergencyContactNo: z.string({
-      invalid_type_error: 'emergency contact no must be string',
-    }),
+    contactNo: z
+      .string({
+        invalid_type_error: 'contact no must be string',
+      })
+      .min(14, { message: 'contact number can`t be less than 14 character' })
+      .max(14, { message: 'contact number can`t be more that 14 character' }),
+    emergencyContactNo: z
+      .string({
+        invalid_type_error: 'emergency contact no must be string',
+      })
+      .min(14, { message: 'contact number can`t be less than 14 character' })
+      .max(14, { message: 'contact number can`t be more that 14 character' }),
     bloodGroup: z.enum([...BloodGroup] as [string, ...string[]]),
     presentAddress: z.string(),
     parmanentAddress: z.string(),
@@ -118,33 +103,6 @@ const studentValidationSchema = z.object({
     }),
     profileImage: z.string().optional(),
   }),
-});
-
-const updateUserNameValidationSchema = z.object({
-  firstName: z
-    .string()
-    .min(1, { message: 'first name can`t be less than one character' })
-    .max(20, { message: 'first name can`t be more than 20 character' })
-    .refine((value) => /^[A-Z]/.test(value), {
-      message: 'first name must be start with a capital letter',
-    })
-    .optional(),
-  middleName: z
-    .string()
-    .min(1, { message: 'middle name can`t be less than one character' })
-    .max(20, { message: 'middle name can`t be more than 20 character' })
-    .refine((value) => /^[A-Z]/.test(value), {
-      message: 'middle name must be start with a capital letter',
-    })
-    .optional(),
-  lastName: z
-    .string()
-    .min(1, { message: 'last name can`t be less than one character' })
-    .max(20, { message: 'last name can`t be more than 20 character' })
-    .refine((value) => /^[A-Z]/.test(value), {
-      message: 'last name must be start with a capital letter',
-    })
-    .optional(),
 });
 
 const updateGuardinValidationSchema = z.object({
@@ -228,11 +186,15 @@ const updateStudentValidationSchema = z.object({
       .string({
         invalid_type_error: 'contact no must be string',
       })
+      .min(14, { message: 'contact number can`t be less than 14 character' })
+      .max(14, { message: 'contact number can`t be more that 14 character' })
       .optional(),
     emergencyContactNo: z
       .string({
         invalid_type_error: 'emergency contact no must be string',
       })
+      .min(14, { message: 'contact number can`t be less than 14 character' })
+      .max(14, { message: 'contact number can`t be more that 14 character' })
       .optional(),
     bloodGroup: z.enum([...BloodGroup] as [string, ...string[]]).optional(),
     presentAddress: z.string().optional(),

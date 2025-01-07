@@ -5,8 +5,8 @@ import { Student } from './student.model';
 import mongoose from 'mongoose';
 import { User } from '../user/user.model';
 import { TStudent } from './student.interface';
-import { studentSearchAbleFields } from './student.constant';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { SearchableFields } from '../../global/constant';
 
 const getAllStudent = async (query: Record<string, unknown>) => {
   // const queryObject = { ...query };
@@ -81,7 +81,7 @@ const getAllStudent = async (query: Record<string, unknown>) => {
       }),
     query
   )
-    .search(studentSearchAbleFields)
+    .search(SearchableFields)
     .filter()
     .sort()
     .paginateQuery()
@@ -92,7 +92,7 @@ const getAllStudent = async (query: Record<string, unknown>) => {
 };
 
 const getSingleStudent = async (id: string) => {
-  const result = await Student.findById(id)
+  const result = await Student.findOne({ id })
     .populate('user')
     .populate('admissionSemister')
     .populate({
@@ -101,11 +101,12 @@ const getSingleStudent = async (id: string) => {
         path: 'academicFaculty',
       },
     });
-
-  if (!result) {
+  if (!result || result?.isDeleted) {
     throw new AppError(StatusCodes.NOT_FOUND, 'This student doesn`t exists');
   }
-  if (result.isDeleted) {
+
+  const isStudentBlocked = await User.findOne({ id });
+  if (!isStudentBlocked || isStudentBlocked?.status !== 'in-progress') {
     throw new AppError(StatusCodes.BAD_REQUEST, 'This student is blocked');
   }
   return result;
@@ -141,7 +142,7 @@ const deleteStudent = async (id: string) => {
 
     await session.commitTransaction();
     await session.endSession();
-    return deletedStudent;
+    return null;
   } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
@@ -151,11 +152,12 @@ const deleteStudent = async (id: string) => {
 
 const updateStudent = async (id: string, payload: Partial<TStudent>) => {
   const isStudentExist = await Student.findOne({ id });
-  if (!isStudentExist) {
+  if (!isStudentExist || isStudentExist?.isDeleted) {
     throw new AppError(StatusCodes.NOT_FOUND, 'this student doesn`t exist');
   }
-  if (isStudentExist.isDeleted) {
-    throw new AppError(StatusCodes.BAD_REQUEST, 'this student is blocked');
+  const isStudentBlocked = await User.findOne({ id });
+  if (!isStudentBlocked || isStudentBlocked?.status !== 'in-progress') {
+    throw new AppError(StatusCodes.BAD_REQUEST, 'This student is blocked');
   }
 
   const { name, guardian, localGuardian, ...remainingStudent } = payload;

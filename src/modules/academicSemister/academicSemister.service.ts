@@ -1,8 +1,12 @@
 import { StatusCodes } from 'http-status-codes';
 import AppError from '../../error/AppError';
-import { academicSemisterNameCodeStructure } from './academicSemister.constant';
+import {
+  academicSemisterNameCodeStructure,
+  academicSemisterSearchableFields,
+} from './academicSemister.constant';
 import { TAcademicSemister } from './academicSemister.interface';
 import { AcademicSemister } from './academicSemister.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const createAcademicSemister = async (payload: TAcademicSemister) => {
   if (academicSemisterNameCodeStructure[payload.name] !== payload.code) {
@@ -12,8 +16,13 @@ const createAcademicSemister = async (payload: TAcademicSemister) => {
   return result;
 };
 
-const getAllAcademySemister = async () => {
-  const result = await AcademicSemister.find();
+const getAllAcademySemister = async (query: Record<string, unknown>) => {
+  const academicSemisterQuery = new QueryBuilder(AcademicSemister.find(), query)
+    .search(academicSemisterSearchableFields)
+    .filter()
+    .sort()
+    .fields();
+  const result = await academicSemisterQuery.modelQuery;
   return result;
 };
 

@@ -2,14 +2,21 @@ import { StatusCodes } from 'http-status-codes';
 import AppError from '../../error/AppError';
 import { TAcademicFaculty } from './academicFaculty.interface';
 import { AcademicFaculty } from './academicFaculty.Model';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const createAcademicFaculty = async (payload: TAcademicFaculty) => {
   const result = await AcademicFaculty.create(payload);
   return result;
 };
 
-const getAllAcademicFaculty = async () => {
-  const result = await AcademicFaculty.find();
+const getAllAcademicFaculty = async (query: Record<string, unknown>) => {
+  const academicFacultySearchableFields: string[] = ['name'];
+  const academicFacultyQuery = new QueryBuilder(AcademicFaculty.find(), query)
+    .search(academicFacultySearchableFields)
+    .filter()
+    .sort();
+
+  const result = await academicFacultyQuery.modelQuery;
   return result;
 };
 

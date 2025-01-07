@@ -21,7 +21,8 @@ const createAcademicSemister = catchAsync(
 
 const getAllAcademicSemister = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const result = await academicSemisterServie.getAllAcademySemister();
+    const query = req.query;
+    const result = await academicSemisterServie.getAllAcademySemister(query);
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.CREATED,

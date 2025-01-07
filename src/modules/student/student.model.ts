@@ -1,30 +1,9 @@
 import { model, Schema } from 'mongoose';
-import {
-  TGuardian,
-  TLocalGuardian,
-  TStudent,
-  TUserName,
-} from './student.interface';
-import { BloodGroup, Gender } from './student.constant';
+import { TGuardian, TLocalGuardian, TStudent } from './student.interface';
+import { BloodGroup, Gender } from '../../global/constant';
+import { userNameSchema } from '../../global/userSchema';
 // import AppError from '../../error/AppError';
 // import { StatusCodes } from 'http-status-codes';
-
-const userNameSchema = new Schema<TUserName>({
-  firstName: {
-    type: String,
-    trim: true,
-    required: [true, 'first name is required'],
-  },
-  middleName: {
-    type: String,
-    trim: true,
-  },
-  lastName: {
-    type: String,
-    trim: true,
-    required: [true, 'last name is required'],
-  },
-});
 
 const guardianSchema = new Schema<TGuardian>({
   fatherName: {

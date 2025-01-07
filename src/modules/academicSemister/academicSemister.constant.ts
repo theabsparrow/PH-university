@@ -33,3 +33,9 @@ export const academicSemisterNameCodeStructure: TAcademicSemisterNameCodeStructu
     Summer: '02',
     Fall: '03',
   };
+
+export const academicSemisterSearchableFields: string[] = [
+  'name',
+  'code',
+  'year',
+];
