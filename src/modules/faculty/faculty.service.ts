@@ -5,7 +5,6 @@ import { Faculty } from './faculty.model';
 import { User } from '../user/user.model';
 import mongoose from 'mongoose';
 import { TFaculty } from './faculty.interface';
-import { Student } from '../student/student.model';
 import { SearchableFields } from '../../global/constant';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -106,7 +105,7 @@ const updateFaculty = async (id: string, payload: Partial<TFaculty>) => {
       modifiedData[`name.${key}`] = value;
     }
   }
-  const result = await Student.findByIdAndUpdate(id, modifiedData, {
+  const result = await Faculty.findByIdAndUpdate(id, modifiedData, {
     new: true,
     runValidators: true,
   });

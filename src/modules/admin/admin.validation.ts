@@ -1,5 +1,8 @@
 import { z } from 'zod';
-import { userNameValidationSchema } from '../../global/validation';
+import {
+  updateUserNameValidationSchema,
+  userNameValidationSchema,
+} from '../../global/validation';
 import { BloodGroup, Gender } from '../../global/constant';
 
 const adminValidationSchema = z.object({
@@ -12,10 +15,6 @@ const adminValidationSchema = z.object({
     .optional(),
   admin: z.object({
     name: userNameValidationSchema,
-    designation: z
-      .string()
-      .min(4, { message: 'designation can`t be less than 2 character' })
-      .max(25, { message: 'designation can`t be more than 25 character' }),
     gender: z.enum([...Gender] as [string, ...string[]]),
     dateOfBirth: z.string({
       invalid_type_error: 'date must be string',
@@ -41,12 +40,7 @@ const adminValidationSchema = z.object({
 });
 
 const updateAdminValidationSchema = z.object({
-  name: userNameValidationSchema.optional(),
-  designation: z
-    .string()
-    .min(4, { message: 'designation can`t be less than 2 character' })
-    .max(25, { message: 'designation can`t be more than 25 character' })
-    .optional(),
+  name: updateUserNameValidationSchema.optional(),
   gender: z.enum([...Gender] as [string, ...string[]]).optional(),
   dateOfBirth: z
     .string({

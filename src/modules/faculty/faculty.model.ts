@@ -1,3 +1,5 @@
+// import { StatusCodes } from 'http-status-codes';
+// import AppError from '../../error/AppError';
 import { BloodGroup, Gender } from '../../global/constant';
 import { userNameSchema } from '../../global/userSchema';
 import { TFaculty } from './faculty.interface';
@@ -83,5 +85,20 @@ const facultySchema = new Schema<TFaculty>(
     timestamps: true,
   }
 );
+
+// facultySchema.pre('save', async function (next) {
+//   const isEmailUsed = await Faculty.findOne({ email: this.email });
+//   if (isEmailUsed) {
+//     throw new AppError(StatusCodes.CONFLICT, 'this email is already used');
+//   }
+//   const isPhoneExist = await Faculty.findOne({ contactNo: this.contactNo });
+//   if (isPhoneExist) {
+//     throw new AppError(
+//       StatusCodes.CONFLICT,
+//       'this phone number is aleready exists'
+//     );
+//   }
+//   next();
+// });
 
 export const Faculty = model<TFaculty>('Faculty', facultySchema);

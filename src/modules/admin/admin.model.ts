@@ -2,6 +2,8 @@ import { model, Schema } from 'mongoose';
 import { TAdmin } from './admin.interface';
 import { userNameSchema } from '../../global/userSchema';
 import { BloodGroup, Gender } from '../../global/constant';
+// import AppError from '../../error/AppError';
+// import { StatusCodes } from 'http-status-codes';
 
 const adminSchema = new Schema<TAdmin>(
   {
@@ -15,11 +17,6 @@ const adminSchema = new Schema<TAdmin>(
       required: [true, 'User ID is required'],
       unique: true,
       ref: 'User',
-    },
-    designation: {
-      type: String,
-      required: [true, ' designation is required'],
-      trim: true,
     },
     name: {
       type: userNameSchema,
@@ -78,5 +75,19 @@ const adminSchema = new Schema<TAdmin>(
     timestamps: true,
   }
 );
+
+// adminSchema.pre('save', async function (next) {
+//   const isEmaiUsed = await Admin.findOne({ email: this.email });
+//   const isPhoneERxist = await Admin.findOne({ contactNo: this.contactNo });
+//   if (isEmaiUsed) {
+//     throw new AppError(StatusCodes.CONFLICT, 'this email is already used');
+//   } else if (isPhoneERxist) {
+//     throw new AppError(
+//       StatusCodes.CONFLICT,
+//       'this phone number is already exists'
+//     );
+//   }
+//   next();
+// });
 
 export const Admin = model<TAdmin>('Admin', adminSchema);

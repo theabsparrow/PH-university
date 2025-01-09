@@ -87,6 +87,8 @@ const updateAdmin = async (id: string, payload: Partial<TAdmin>) => {
       modifiedData[`name.${key}`] = value;
     }
   }
+
+  console.log(modifiedData);
   const result = await Admin.findByIdAndUpdate(id, modifiedData, {
     new: true,
     runValidators: true,

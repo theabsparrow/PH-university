@@ -35,7 +35,7 @@ const getSingleFaculty = catchAsync(
 const updateFaculty = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
-    const payload = req.body;
+    const payload = req.body.faculty;
     const result = await facultyService.updateFaculty(id, payload);
     sendResponse(res, {
       success: true,

@@ -156,20 +156,12 @@ const studentSchema = new Schema<TStudent>(
 //   const isPhoneNumberExist = await Student.findOne({
 //     contactNo: this.contactNo,
 //   });
-//   const isStudentIDexist = await Student.findOne({
-//     id: this.id,
-//   });
 //   if (isEmailUsed) {
 //     throw new AppError(StatusCodes.CONFLICT, 'this email is already exist');
 //   } else if (isPhoneNumberExist) {
 //     throw new AppError(
 //       StatusCodes.CONFLICT,
 //       'this phone number is already exist'
-//     );
-//   } else if (isStudentIDexist) {
-//     throw new AppError(
-//       StatusCodes.CONFLICT,
-//       'this student ID is already exist'
 //     );
 //   }
 //   next();

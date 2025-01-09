@@ -35,7 +35,7 @@ const getSingleAdmin = catchAsync(
 const updateAdmin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
-    const payload = req.body;
+    const payload = req.body.admin;
     const result = await adminService.updateAdmin(id, payload);
     sendResponse(res, {
       success: true,

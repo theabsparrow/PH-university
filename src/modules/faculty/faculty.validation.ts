@@ -1,5 +1,8 @@
 import { z } from 'zod';
-import { userNameValidationSchema } from '../../global/validation';
+import {
+  updateUserNameValidationSchema,
+  userNameValidationSchema,
+} from '../../global/validation';
 import { BloodGroup, Gender } from '../../global/constant';
 
 const facultyValidationSchema = z.object({
@@ -44,42 +47,44 @@ const facultyValidationSchema = z.object({
 });
 
 const updateFacultyValidationSchema = z.object({
-  name: userNameValidationSchema.optional(),
-  designation: z
-    .string()
-    .min(4, { message: 'designation can`t be less than 2 character' })
-    .max(25, { message: 'designation can`t be more than 25 character' })
-    .optional(),
-  gender: z.enum([...Gender] as [string, ...string[]]).optional(),
-  dateOfBirth: z
-    .string({
-      invalid_type_error: 'date must be string',
-    })
-    .optional(),
-  email: z.string().email().optional(),
-  contactNo: z
-    .string({
-      invalid_type_error: 'contact no must be string',
-    })
-    .min(14, { message: 'contact number can`t be less than 14 character' })
-    .max(14, { message: 'contact number can`t be more that 14 character' })
-    .optional(),
-  emergencyContactNo: z
-    .string({
-      invalid_type_error: 'emergency contact no must be string',
-    })
-    .min(14, { message: 'contact number can`t be less than 14 character' })
-    .max(14, { message: 'contact number can`t be more that 14 character' })
-    .optional(),
-  bloodGroup: z.enum([...BloodGroup] as [string, ...string[]]).optional(),
-  presentAddress: z.string().optional(),
-  parmanentAddress: z.string().optional(),
-  academicDepartment: z
-    .string({
-      invalid_type_error: 'academic department is required',
-    })
-    .optional(),
-  profileImage: z.string().optional().optional(),
+  faculty: z.object({
+    name: updateUserNameValidationSchema.optional(),
+    designation: z
+      .string()
+      .min(4, { message: 'designation can`t be less than 2 character' })
+      .max(25, { message: 'designation can`t be more than 25 character' })
+      .optional(),
+    gender: z.enum([...Gender] as [string, ...string[]]).optional(),
+    dateOfBirth: z
+      .string({
+        invalid_type_error: 'date must be string',
+      })
+      .optional(),
+    email: z.string().email().optional(),
+    contactNo: z
+      .string({
+        invalid_type_error: 'contact no must be string',
+      })
+      .min(14, { message: 'contact number can`t be less than 14 character' })
+      .max(14, { message: 'contact number can`t be more that 14 character' })
+      .optional(),
+    emergencyContactNo: z
+      .string({
+        invalid_type_error: 'emergency contact no must be string',
+      })
+      .min(14, { message: 'contact number can`t be less than 14 character' })
+      .max(14, { message: 'contact number can`t be more that 14 character' })
+      .optional(),
+    bloodGroup: z.enum([...BloodGroup] as [string, ...string[]]).optional(),
+    presentAddress: z.string().optional(),
+    parmanentAddress: z.string().optional(),
+    academicDepartment: z
+      .string({
+        invalid_type_error: 'academic department is required',
+      })
+      .optional(),
+    profileImage: z.string().optional().optional(),
+  }),
 });
 
 export const facultyValidation = {

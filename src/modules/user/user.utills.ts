@@ -56,12 +56,13 @@ const findLastFacultyId = async () => {
       createdAt: -1,
     })
     .lean();
-  return lastFacultyID?._id ? lastFacultyID?.id : undefined;
+  return lastFacultyID?.id ? lastFacultyID?.id : undefined;
 };
 // generate faculty ID
 export const generateFacultyID = async () => {
   let currentID = (0).toString();
   const lastFacultyID = await findLastFacultyId();
+  // console.log(lastFacultyID);
   if (lastFacultyID) {
     currentID = lastFacultyID.substring(2);
   }
