@@ -1,4 +1,6 @@
+import { StatusCodes } from 'http-status-codes';
 import QueryBuilder from '../../builder/QueryBuilder';
+import AppError from '../../error/AppError';
 import { courseSearchAbleFields } from './course.constant';
 import { TCourse } from './course.interface';
 import { Course } from './course.model';
@@ -24,13 +26,22 @@ const getAllCourse = async (query: Record<string, unknown>) => {
 };
 
 const getASingleCourse = async (id: string) => {
-  const result = await Course.findById(id);
+  const result = await Course.findById(id).populate('preRequisite.course');
+  if (!result) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'this course does not exists');
+  }
   return result;
 };
 
 const updateACourse = async (id: string, payload: Partial<TCourse>) => {
-  const result = await Course.findByIdAndUpdate(id, payload);
-  return result;
+  const { preRequisite, ...remainingCourseData } = payload;
+  const updateBasicData = await Course.findByIdAndUpdate(
+    id,
+    remainingCourseData,
+    { new: true, runValidators: true }
+  );
+  // const result = await Course.findByIdAndUpdate(id, payload);
+  return updateBasicData;
 };
 
 const deleteACourse = async (id: string) => {

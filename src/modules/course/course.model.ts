@@ -1,5 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { TCourse, TPreRequisite } from './course.interface';
+// import AppError from '../../error/AppError';
+// import { StatusCodes } from 'http-status-codes';
 
 const coursePreRequisiteSchema = new Schema<TPreRequisite>({
   course: {
@@ -16,7 +18,7 @@ const courseSchema = new Schema<TCourse>(
     title: {
       type: String,
       required: [true, 'title is required'],
-      unique: true,
+      //   unique: true,
       trim: true,
     },
     prefix: {
@@ -27,6 +29,7 @@ const courseSchema = new Schema<TCourse>(
     code: {
       type: Number,
       required: [true, 'code is requied'],
+      //   unique: true,
     },
     credit: {
       type: Number,
@@ -42,5 +45,19 @@ const courseSchema = new Schema<TCourse>(
     timestamps: true,
   }
 );
+
+// courseSchema.pre('save', async function (next) {
+//   const isTitleExist = await Course.findOne({ title: this.title });
+//   const isCodeExist = await Course.findOne({ code: this.code });
+//   if (isTitleExist) {
+//     throw new AppError(StatusCodes.CONFLICT, 'This title is already exist');
+//   } else if (isCodeExist) {
+//     throw new AppError(
+//       StatusCodes.CONFLICT,
+//       'this course code is already exist, try differnet one'
+//     );
+//   }
+//   next();
+// });
 
 export const Course = model<TCourse>('Course', courseSchema);
