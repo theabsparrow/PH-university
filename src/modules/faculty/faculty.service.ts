@@ -81,7 +81,7 @@ const deleteFaculty = async (id: string) => {
   } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
-    throw new Error(err);
+    throw new AppError(StatusCodes.BAD_REQUEST, err);
   }
 };
 

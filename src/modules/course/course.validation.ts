@@ -4,6 +4,16 @@ const preRequisiteValidationSchema = z.object({
     required_error: 'course id must be string',
   }),
 });
+
+const updatePreRequisiteValidationSchema = z.object({
+  course: z.string({
+    required_error: 'course id must be string',
+  }),
+  isDeleted: z.boolean({
+    required_error: 'isDeleted should be boolean',
+  }),
+});
+
 const courseValidationSchema = z.object({
   title: z
     .string({
@@ -57,7 +67,7 @@ const updateCourseValidationSchema = z.object({
       required_error: 'credit must be number',
     })
     .optional(),
-  preRequisite: z.array(preRequisiteValidationSchema).optional().optional(),
+  preRequisite: z.array(updatePreRequisiteValidationSchema).optional(),
 });
 
 export const courseValidation = {

@@ -58,7 +58,7 @@ const createStudent = async (password: string, payload: TStudent) => {
   } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
-    throw new Error(err);
+    throw new AppError(StatusCodes.BAD_REQUEST, err);
   }
 };
 
@@ -97,7 +97,7 @@ const createFAculty = async (password: string, payload: TFaculty) => {
   } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
-    throw new Error(err);
+    throw new AppError(StatusCodes.BAD_REQUEST, err);
   }
 };
 
@@ -130,7 +130,7 @@ const createAdmin = async (password: string, payload: TAdmin) => {
   } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
-    throw new Error(err);
+    throw new AppError(StatusCodes.BAD_REQUEST, err);
   }
 };
 

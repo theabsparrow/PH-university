@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { TCourse, TPreRequisite } from './course.interface';
-// import AppError from '../../error/AppError';
-// import { StatusCodes } from 'http-status-codes';
+import AppError from '../../error/AppError';
+import { StatusCodes } from 'http-status-codes';
 
 const coursePreRequisiteSchema = new Schema<TPreRequisite>({
   course: {
@@ -46,18 +46,49 @@ const courseSchema = new Schema<TCourse>(
   }
 );
 
-// courseSchema.pre('save', async function (next) {
-//   const isTitleExist = await Course.findOne({ title: this.title });
-//   const isCodeExist = await Course.findOne({ code: this.code });
-//   if (isTitleExist) {
-//     throw new AppError(StatusCodes.CONFLICT, 'This title is already exist');
-//   } else if (isCodeExist) {
-//     throw new AppError(
-//       StatusCodes.CONFLICT,
-//       'this course code is already exist, try differnet one'
-//     );
-//   }
-//   next();
-// });
+courseSchema.pre('save', async function (next) {
+  //   const isTitleExist = await Course.findOne({ title: this.title });
+  //   const isCodeExist = await Course.findOne({ code: this.code });
+  //   if (isTitleExist) {
+  //     throw new AppError(StatusCodes.CONFLICT, 'This title is already exist');
+  //   } else if (isCodeExist) {
+  //     throw new AppError(
+  //       StatusCodes.CONFLICT,
+  //       'this course code is already exist, try differnet one'
+  //     );
+  //   }
+  const preRequisiteCourses = this.preRequisite;
+
+  if (preRequisiteCourses && preRequisiteCourses.length > 0) {
+    for (const preRequisiteCourse of preRequisiteCourses) {
+      const { course } = preRequisiteCourse;
+      const isExistCourse = await Course.findById(course);
+      if (!isExistCourse) {
+        throw new AppError(
+          StatusCodes.NOT_FOUND,
+          'the prerequisite course you have provided doesn`t exist'
+        );
+      }
+    }
+  }
+  next();
+});
+
+courseSchema.pre('findOneAndUpdate', async function (next) {
+  const query = this.getUpdate();
+
+  if (query && typeof query === 'object' && !Array.isArray(query)) {
+    const title = query.title;
+    const code = query.code;
+    const isNameExist = await Course.findOne({ title });
+    const isCodeExist = await Course.findOne({ code });
+    if (isNameExist) {
+      throw new AppError(StatusCodes.CONFLICT, 'This title is already exists');
+    } else if (isCodeExist) {
+      throw new AppError(StatusCodes.CONFLICT, 'This code is already exists');
+    }
+  }
+  next();
+});
 
 export const Course = model<TCourse>('Course', courseSchema);
