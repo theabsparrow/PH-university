@@ -17,6 +17,6 @@ router.patch(
   validateRequest(courseValidation.updateCourseValidationSchema),
   courseColtroller.updateACourse
 );
-router.delete('/id', courseColtroller.deleteACourse);
+router.delete('/:id', courseColtroller.deleteACourse);
 
 export const courseRoute = router;

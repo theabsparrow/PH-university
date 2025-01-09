@@ -29,7 +29,7 @@ const getAllCourse = async (query: Record<string, unknown>) => {
 
 const getASingleCourse = async (id: string) => {
   const result = await Course.findById(id).populate('preRequisite.course');
-  if (!result) {
+  if (!result || result.isDeleted) {
     throw new AppError(StatusCodes.NOT_FOUND, 'this course does not exists');
   }
   return result;
@@ -37,7 +37,7 @@ const getASingleCourse = async (id: string) => {
 
 const updateACourse = async (id: string, payload: Partial<TCourse>) => {
   const isCourseExist = await Course.findOne({ _id: id });
-  if (!isCourseExist) {
+  if (!isCourseExist || isCourseExist.isDeleted) {
     throw new AppError(StatusCodes.NOT_FOUND, 'course does`t found');
   }
 
@@ -130,7 +130,7 @@ const updateACourse = async (id: string, payload: Partial<TCourse>) => {
 
 const deleteACourse = async (id: string) => {
   const isCourseExist = await Course.findById(id);
-  if (!isCourseExist) {
+  if (!isCourseExist || isCourseExist.isDeleted) {
     throw new AppError(StatusCodes.NOT_FOUND, 'This course does not found');
   }
   const result = await Course.findByIdAndUpdate(
