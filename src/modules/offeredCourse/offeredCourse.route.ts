@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import validateRequest from '../../middlewire/validateRequest';
-import { offeredCourseValidation } from './offeredCourse.validation';
 import { offeredCourseController } from './offeredCourse.controller';
+import { offeredCourseValidation } from './offeredCourse.validation';
 
 const router = Router();
 router.post(
   '/create-offeredCourse',
-  validateRequest(offeredCourseValidation.offeredCourseValidationSchema),
+  validateRequest(offeredCourseValidation.updateOfferedCourseValidationSchema),
   offeredCourseController.createOfferedCourse
 );
 
