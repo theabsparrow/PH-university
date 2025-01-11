@@ -3,15 +3,21 @@ import { semisterRegistrationStatus } from './semisterRegistration.constant';
 
 const semisterRegistrationValidationSchema = z.object({
   academicSemister: z.string(),
-  status: z.enum([...(semisterRegistrationStatus as [string, ...string[]])]),
+  status: z
+    .enum([...(semisterRegistrationStatus as [string, ...string[]])])
+    .optional(),
   startDate: z.string().datetime(),
   endDate: z.string().datetime(),
-  minCredit: z.number({
-    required_error: 'min credit must be number',
-  }),
-  maxCredit: z.number({
-    required_error: 'max credit must be number',
-  }),
+  minCredit: z
+    .number({
+      required_error: 'min credit must be number',
+    })
+    .optional(),
+  maxCredit: z
+    .number({
+      required_error: 'max credit must be number',
+    })
+    .optional(),
 });
 
 const updateSemisterRegistrationValidationSchema = z.object({
