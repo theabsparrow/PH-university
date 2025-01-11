@@ -60,6 +60,33 @@ semisterRegistrationSchema.pre('save', async function (next) {
   next();
 });
 
+semisterRegistrationSchema.pre('findOneAndUpdate', async function (next) {
+  const query = this.getUpdate();
+
+  if (query && typeof query === 'object' && !Array.isArray(query)) {
+    const academicSemister = query?.academicSemister;
+    const isAcademicSemisterExists = await AcademicSemister.findById(
+      academicSemister
+    );
+    const isSemisterRegistered = await SemisterRegistration.findOne({
+      academicSemister,
+    });
+    if (!isAcademicSemisterExists) {
+      throw new AppError(
+        StatusCodes.NOT_FOUND,
+        'this academic semister not found'
+      );
+    }
+    if (isSemisterRegistered) {
+      throw new AppError(
+        StatusCodes.CONFLICT,
+        'this semister is already registered'
+      );
+    }
+  }
+  next();
+});
+
 export const SemisterRegistration = model<TSemisterRegistration>(
   'SemisterRegistration',
   semisterRegistrationSchema

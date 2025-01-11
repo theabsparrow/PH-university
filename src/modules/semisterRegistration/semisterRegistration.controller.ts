@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
 import catchAsync from '../../utills/catchAsync';
 import { semisterRegistrationService } from './semisterRegistration.service';

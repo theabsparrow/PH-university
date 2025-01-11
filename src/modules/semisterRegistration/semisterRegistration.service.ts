@@ -3,9 +3,21 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/AppError';
 import { TSemisterRegistration } from './semisterRegistration.interface';
 import { SemisterRegistration } from './semisterRegistration.model';
-import { AcademicSemister } from '../academicSemister/academicSemister.model';
+import { registrationStatus } from './semisterRegistration.constant';
 
 const createSemisterRegistrtion = async (payload: TSemisterRegistration) => {
+  const IsAnyUpcomingOrOngoingSemister = await SemisterRegistration.findOne({
+    $or: [
+      { status: registrationStatus.UPCOMING },
+      { status: registrationStatus.ONGOING },
+    ],
+  });
+  if (IsAnyUpcomingOrOngoingSemister) {
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      `there is already an ${IsAnyUpcomingOrOngoingSemister?.status} registered semister`
+    );
+  }
   const result = await SemisterRegistration.create(payload);
   return result;
 };
@@ -24,7 +36,9 @@ const getAllRegisteredSemister = async (query: Record<string, unknown>) => {
 };
 
 const getSingleRegisteredSemister = async (id: string) => {
-  const isregisteredSemisteredExists = await SemisterRegistration.findById(id);
+  const isregisteredSemisteredExists = await SemisterRegistration.findById(
+    id
+  ).populate('academicSemister');
   if (!isregisteredSemisteredExists) {
     throw new AppError(
       StatusCodes.NOT_FOUND,
@@ -34,6 +48,7 @@ const getSingleRegisteredSemister = async (id: string) => {
   return isregisteredSemisteredExists;
 };
 
+// update semister registration
 const updateRegisteredSemister = async (
   id: string,
   payload: Partial<TSemisterRegistration>
@@ -47,30 +62,39 @@ const updateRegisteredSemister = async (
     );
   }
 
-  //   check if the academic semister comes from body is exists
-  const academicSemister = payload?.academicSemister;
-  if (academicSemister) {
-    const isAcademicSemisterExists = await AcademicSemister.findById(
-      academicSemister
+  // check if the semister is endede
+  if (
+    isregisteredSemisteredExists &&
+    isregisteredSemisteredExists.status === registrationStatus.ENDED
+  ) {
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      `this semister is already ${isregisteredSemisteredExists.status}`
     );
-    if (!isAcademicSemisterExists) {
-      throw new AppError(
-        StatusCodes.NOT_FOUND,
-        'the academic semister you provided doesnot exist'
-      );
-    }
   }
 
-  //   check if the academic semister is already registered
-  const isSemisterAlreadyExists = await SemisterRegistration.findOne({
-    academicSemister,
-  });
-  if (isSemisterAlreadyExists) {
+  // check if the semister status is not conflicting
+  const requestedStatus = payload?.status;
+  const currentStatus = isregisteredSemisteredExists?.status;
+  if (
+    (currentStatus === registrationStatus.UPCOMING &&
+      requestedStatus === registrationStatus.ENDED) ||
+    (currentStatus === registrationStatus.ONGOING &&
+      requestedStatus === registrationStatus.UPCOMING)
+  ) {
     throw new AppError(
-      StatusCodes.CONFLICT,
-      'the academic semister you provided is already registered'
+      StatusCodes.BAD_REQUEST,
+      `you can't derectly update status from ${currentStatus} to ${requestedStatus}`
     );
   }
+
+  // update semister registration
+  const result = await SemisterRegistration.findOneAndUpdate(
+    { _id: id },
+    payload,
+    { new: true, runValidators: true }
+  );
+  return result;
 };
 
 export const semisterRegistrationService = {
