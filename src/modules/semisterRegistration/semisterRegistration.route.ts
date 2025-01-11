@@ -22,5 +22,5 @@ router.patch(
   ),
   semisterRegistrationController.updateRegisteredSemister
 );
-
+router.delete('/:id', semisterRegistrationController.deleteRegisteredSemister);
 export const semisterRegistrationRoute = router;

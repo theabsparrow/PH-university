@@ -3,6 +3,7 @@ import catchAsync from '../../utills/catchAsync';
 import { offeredCourseService } from './offeredCourse.service';
 import sendResponse from '../../utills/sendResponse';
 import { StatusCodes } from 'http-status-codes';
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 
@@ -14,6 +15,32 @@ const createOfferedCourse = catchAsync(
       success: true,
       statusCode: StatusCodes.CREATED,
       message: 'offered course created successfully',
+      data: result,
+    });
+  }
+);
+
+const getAllOfferedCourse = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const query = req.query;
+    const result = await offeredCourseService.getAllOfferedCourse(query);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'offered coursees are retrived successfully',
+      data: result,
+    });
+  }
+);
+
+const getSingleOfferedCourse = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+    const result = await offeredCourseService.getASingleOfferedCourse(id);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'offered course is retrived successfully',
       data: result,
     });
   }
@@ -32,7 +59,23 @@ const updateOfferedCourse = catchAsync(
     });
   }
 );
+
+const deleteOfferedCourse = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+    const result = await offeredCourseService.deleteOfferedCourse(id);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'offered course deleted successfully',
+      data: result,
+    });
+  }
+);
 export const offeredCourseController = {
   createOfferedCourse,
+  getAllOfferedCourse,
   updateOfferedCourse,
+  deleteOfferedCourse,
+  getSingleOfferedCourse,
 };

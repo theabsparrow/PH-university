@@ -12,7 +12,9 @@ import { Course } from '../course/course.model';
 import { Faculty } from '../faculty/faculty.model';
 import { hasTimeConflict } from './offeredCourse.utills';
 import { registrationStatus } from '../semisterRegistration/semisterRegistration.constant';
+import QueryBuilder from '../../builder/QueryBuilder';
 
+// create offered course
 const createOfferedCourse = async (payload: TOfferedCourse) => {
   const {
     semisterRegistration,
@@ -33,6 +35,13 @@ const createOfferedCourse = async (payload: TOfferedCourse) => {
     throw new AppError(
       StatusCodes.NOT_FOUND,
       'this semister is not registered yet'
+    );
+  } else if (
+    isSemisterRegistrationExists?.status !== registrationStatus.UPCOMING
+  ) {
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      `this semister is ${isSemisterRegistrationExists?.status}. so you can't offer it`
     );
   }
   const academicSemister = isSemisterRegistrationExists?.academicSemister;
@@ -89,13 +98,11 @@ const createOfferedCourse = async (payload: TOfferedCourse) => {
     faculty,
     days: { $in: days },
   }).select('days startTime endTime');
-
   const newSchedule = {
     days,
     startTime,
     endTime,
   };
-
   const timeConflict = hasTimeConflict(assignedFacultySchedule, newSchedule);
   if (timeConflict) {
     throw new AppError(
@@ -109,6 +116,27 @@ const createOfferedCourse = async (payload: TOfferedCourse) => {
   return result;
 };
 
+// get all offered course
+const getAllOfferedCourse = async (query: Record<string, unknown>) => {
+  const allOfferedCourseQuery = new QueryBuilder(OfferedCourse.find(), query)
+    .filter()
+    .sort()
+    .paginateQuery()
+    .fields();
+  const result = await allOfferedCourseQuery.modelQuery;
+  return result;
+};
+
+// get a single offered course
+const getASingleOfferedCourse = async (id: string) => {
+  const isOfferedCourseExists = await OfferedCourse.findById(id);
+  if (!isOfferedCourseExists) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'no offered course found');
+  }
+  return isOfferedCourseExists;
+};
+
+// update a offered course
 const updatedOfferCourse = async (
   id: string,
   payload: TUpdateOfferedCourse
@@ -153,7 +181,6 @@ const updatedOfferCourse = async (
     startTime,
     endTime,
   };
-
   const timeConflict = hasTimeConflict(assignedScheduled, newSchedule);
   if (timeConflict) {
     throw new AppError(
@@ -167,7 +194,38 @@ const updatedOfferCourse = async (
   });
   return result;
 };
+
+// delete a offered course
+const deleteOfferedCourse = async (id: string) => {
+  // check if the offered course is exist
+  const isOfferedCourseExists = await OfferedCourse.findById(id);
+  if (!isOfferedCourseExists) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'no offered course found');
+  }
+
+  // check if the semister registration is upcoming
+  const semisterRegistration = isOfferedCourseExists.semisterRegistration;
+  const semisterRegistrationStatus = await SemisterRegistration.findById(
+    semisterRegistration
+  ).select('status');
+  if (
+    semisterRegistrationStatus &&
+    semisterRegistrationStatus?.status !== registrationStatus.UPCOMING
+  ) {
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      `this semister status is ${semisterRegistrationStatus.status}. so you can't delete it`
+    );
+  }
+
+  // final result
+  const result = await OfferedCourse.findByIdAndDelete(id);
+  return result;
+};
 export const offeredCourseService = {
   createOfferedCourse,
+  getAllOfferedCourse,
+  getASingleOfferedCourse,
   updatedOfferCourse,
+  deleteOfferedCourse,
 };

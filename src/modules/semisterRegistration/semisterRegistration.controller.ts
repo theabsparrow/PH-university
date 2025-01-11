@@ -67,9 +67,24 @@ const updateRegisteredSemister = catchAsync(
   }
 );
 
+const deleteRegisteredSemister = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+    const result = await semisterRegistrationService.deleteSemisterRegistration(
+      id
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'registered semister is deleted successfully',
+      data: result,
+    });
+  }
+);
 export const semisterRegistrationController = {
   createSemisterRegistration,
   getAllRegisteredSemister,
   getASingleRegisteredSemister,
   updateRegisteredSemister,
+  deleteRegisteredSemister,
 };

@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { StatusCodes } from 'http-status-codes';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/AppError';
 import { TSemisterRegistration } from './semisterRegistration.interface';
 import { SemisterRegistration } from './semisterRegistration.model';
 import { registrationStatus } from './semisterRegistration.constant';
+import mongoose from 'mongoose';
+import { OfferedCourse } from '../offeredCourse/offeredCourse.model';
 
 const createSemisterRegistrtion = async (payload: TSemisterRegistration) => {
   const IsAnyUpcomingOrOngoingSemister = await SemisterRegistration.findOne({
@@ -97,9 +100,70 @@ const updateRegisteredSemister = async (
   return result;
 };
 
+// delete semister registration
+const deleteSemisterRegistration = async (id: string) => {
+  // check if the registered semister is exists
+  const isregisteredSemisteredExists = await SemisterRegistration.findById(id);
+  if (!isregisteredSemisteredExists) {
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      'this semister is not registered yet'
+    );
+  }
+
+  // check if the semister is upcoming or not
+  const semisterRegistrationStatus = isregisteredSemisteredExists?.status;
+  if (semisterRegistrationStatus !== registrationStatus.UPCOMING) {
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      `this semister is ${semisterRegistrationStatus}, so you can't update it`
+    );
+  }
+
+  // start transactiona nd rollback
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    const deleteOfferedCoursewithThisSemisterRegistration =
+      await OfferedCourse.deleteMany(
+        {
+          semisterRegistration: id,
+        },
+        {
+          new: true,
+          session,
+        }
+      );
+    if (!deleteOfferedCoursewithThisSemisterRegistration) {
+      throw new AppError(
+        StatusCodes.BAD_REQUEST,
+        `faild to delete semister registration`
+      );
+    }
+
+    const deleteSemisterRegistration =
+      await SemisterRegistration.findByIdAndDelete(id, { new: true, session });
+    if (!deleteSemisterRegistration) {
+      throw new AppError(
+        StatusCodes.BAD_REQUEST,
+        `faild to delete semister registration`
+      );
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+    // transaction rollback ends
+    return null;
+  } catch (err: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new AppError(StatusCodes.BAD_REQUEST, err);
+  }
+};
 export const semisterRegistrationService = {
   createSemisterRegistrtion,
   getAllRegisteredSemister,
   getSingleRegisteredSemister,
   updateRegisteredSemister,
+  deleteSemisterRegistration,
 };
