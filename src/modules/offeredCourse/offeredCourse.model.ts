@@ -97,6 +97,25 @@ offeredCourseSchema.pre('save', async function (next) {
   next();
 });
 
+offeredCourseSchema.pre('findOneAndUpdate', async function (next) {
+  const query = this.getUpdate();
+
+  if (query && typeof query && !Array.isArray(query)) {
+    const startTime = query?.startTime;
+    const endTime = query?.endTime;
+    const start = new Date(`1970-01-01T${startTime}:00`);
+    const end = new Date(`1970-01-01T${endTime}:00`);
+    if (end <= start) {
+      throw new AppError(
+        StatusCodes.BAD_REQUEST,
+        'end time should be before start time'
+      );
+    }
+  }
+
+  next();
+});
+
 export const OfferedCourse = model<TOfferedCourse>(
   'OfferedCourse',
   offeredCourseSchema

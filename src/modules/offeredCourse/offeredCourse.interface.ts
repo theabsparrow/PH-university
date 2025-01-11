@@ -14,6 +14,13 @@ export type TOfferedCourse = {
   startTime: string;
   endTime: string;
 };
+export type TUpdateOfferedCourse = {
+  faculty: Types.ObjectId;
+  maxCapacity: number;
+  days: TDay[];
+  startTime: string;
+  endTime: string;
+};
 
 export type TSchedule = {
   days: TDay[];
