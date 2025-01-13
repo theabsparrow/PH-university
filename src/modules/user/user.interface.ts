@@ -18,7 +18,7 @@ export interface userModel extends Model<Tuser> {
   ): Promise<boolean>;
   isPasswordChangedAfterJWTIssued(
     passwordChangeTime: Date,
-    jwtIssuedTime: string
+    jwtIssuedTime: number
   ): boolean;
 }
 

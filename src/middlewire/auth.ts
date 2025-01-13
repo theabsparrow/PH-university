@@ -6,6 +6,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
 import { TUserRole } from '../modules/user/user.interface';
 import { isUserExists } from '../modules/auth/auth.utills';
+import { User } from '../modules/user/user.model';
 
 const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -19,7 +20,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
       token,
       config.jwt_access_secret as string
     ) as JwtPayload;
-    const { userID, userRole } = decoded;
+    const { userID, userRole, iat } = decoded;
 
     const userInfo = await isUserExists(userID);
     // check if the user us exists
@@ -42,6 +43,18 @@ const auth = (...requiredRoles: TUserRole[]) => {
     if (userStatus === 'blocked') {
       throw new AppError(StatusCodes.BAD_REQUEST, 'user is blocked');
     }
+
+    // check if password is changed but token isn't expire
+    const passwordChangedTime = userInfo?.passwordChangedAt as Date;
+    const passwordAndTokenTimeCOmparison = User.isPasswordChangedAfterJWTIssued(
+      passwordChangedTime,
+      iat as number
+    );
+    if (passwordAndTokenTimeCOmparison) {
+      throw new AppError(StatusCodes.UNAUTHORIZED, 'you are not authorizrd');
+    }
+
+    // check if user role doesn't match
     if (requiredRoles && !requiredRoles.includes(userRole)) {
       throw new AppError(StatusCodes.UNAUTHORIZED, 'you are not authorizrd');
     }

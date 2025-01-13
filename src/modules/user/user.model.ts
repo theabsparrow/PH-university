@@ -75,10 +75,11 @@ userSchema.statics.isPasswordMatched = async function (
 };
 
 userSchema.statics.isPasswordChangedAfterJWTIssued = function (
-  passwordChangedTime,
-  jwtIssuedTime
+  passwordChangedTime: Date,
+  jwtIssuedTime: number
 ) {
-  console.log(passwordChangedTime, jwtIssuedTime);
+  const changedPasswordAt = new Date(passwordChangedTime).getTime() / 1000;
+  return changedPasswordAt > jwtIssuedTime;
 };
 
 export const User = model<Tuser, userModel>('User', userSchema);
