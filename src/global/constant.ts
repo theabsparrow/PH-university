@@ -1,4 +1,4 @@
-import { TBloodGroup, TGender } from '../interface';
+import { TBloodGroup, TGender } from '../interface/global';
 
 export const BloodGroup: TBloodGroup[] = [
   'A+',

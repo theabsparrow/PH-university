@@ -1,6 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { TAcademicDepartment } from './academicDepartment.interface';
-import { Tquery } from '../../interface';
+import { Tquery } from '../../interface/global';
 import AppError from '../../error/AppError';
 import { StatusCodes } from 'http-status-codes';
 

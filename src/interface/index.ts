@@ -1,26 +1,10 @@
-export type TResponse<T> = {
-  statusCode: number;
-  success: boolean;
-  message?: string;
-  data: T;
-};
+import { JwtPayload } from 'jsonwebtoken';
 
-export type Tquery = Record<string, unknown>;
-
-export type TUserName = {
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-};
-
-export type TBloodGroup =
-  | 'A+'
-  | 'A-'
-  | 'B+'
-  | 'B-'
-  | 'AB+'
-  | 'AB-'
-  | 'O+'
-  | 'O-';
-
-export type TGender = 'male' | 'female' | 'other';
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace Express {
+    interface Request {
+      user: JwtPayload;
+    }
+  }
+}

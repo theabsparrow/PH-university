@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { TBloodGroup, TGender, TUserName } from '../../interface';
+import { TBloodGroup, TGender, TUserName } from '../../interface/global';
 
 export type TGuardian = {
   fatherName: string;

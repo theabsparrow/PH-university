@@ -8,6 +8,7 @@ import { StatusCodes } from 'http-status-codes';
 
 const getAllFaculty = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    // console.log(req.user);
     const query = req.query;
     const result = await facultyService.getAllFaculty(query);
     sendResponse(res, {

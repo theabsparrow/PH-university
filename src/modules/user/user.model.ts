@@ -1,11 +1,11 @@
 import { model, Schema } from 'mongoose';
-import { Tuser } from './user.interface';
+import { Tuser, userModel } from './user.interface';
 import bcrypt from 'bcrypt';
 import config from '../../config';
 import AppError from '../../error/AppError';
 import { StatusCodes } from 'http-status-codes';
 
-const userSchema = new Schema<Tuser>(
+const userSchema = new Schema<Tuser, userModel>(
   {
     id: {
       type: String,
@@ -15,10 +15,14 @@ const userSchema = new Schema<Tuser>(
     password: {
       type: String,
       required: [true, 'password is required'],
+      select: 0,
     },
     needsPasswordChange: {
       type: Boolean,
       default: true,
+    },
+    passwordChangedAt: {
+      type: Date,
     },
     role: {
       type: String,
@@ -57,9 +61,16 @@ userSchema.pre('save', async function (next) {
   }
   next();
 });
+
 userSchema.post('save', function (data, next) {
   data.password = '';
   next();
 });
 
-export const User = model<Tuser>('User', userSchema);
+userSchema.statics.isPasswordMatched = async function (
+  givenPassword,
+  matchedPassword
+) {
+  return await bcrypt.compare(givenPassword, matchedPassword);
+};
+export const User = model<Tuser, userModel>('User', userSchema);
