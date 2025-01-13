@@ -16,6 +16,10 @@ export interface userModel extends Model<Tuser> {
     givenPassword: string,
     matchedPassword: string
   ): Promise<boolean>;
+  isPasswordChangedAfterJWTIssued(
+    passwordChangeTime: Date,
+    jwtIssuedTime: string
+  ): boolean;
 }
 
 export type TUserRole = keyof typeof USER_ROLE;

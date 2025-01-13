@@ -73,4 +73,12 @@ userSchema.statics.isPasswordMatched = async function (
 ) {
   return await bcrypt.compare(givenPassword, matchedPassword);
 };
+
+userSchema.statics.isPasswordChangedAfterJWTIssued = function (
+  passwordChangedTime,
+  jwtIssuedTime
+) {
+  console.log(passwordChangedTime, jwtIssuedTime);
+};
+
 export const User = model<Tuser, userModel>('User', userSchema);

@@ -55,7 +55,7 @@ const changePassword = async (user: JwtPayload, payload: TChangePassword) => {
   const { oldPassword, newPassword } = payload;
   const userInfo = await isUserExists(userID);
   // check if the user us exists
-  if (!user) {
+  if (!userInfo) {
     throw new AppError(
       StatusCodes.NOT_FOUND,
       'Login failed. User ID is incorrect'
