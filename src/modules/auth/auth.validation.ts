@@ -46,3 +46,5 @@ export const loginValidation = {
   forgetPasswordValidationSchema,
   resetPasswordValidationSchema,
 };
+
+// http://localhost:3000?id=A-0002&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJBLTAwMDIiLCJ1c2VyUm9sZSI6ImFkbWluIiwiaWF0IjoxNzM3MDU1NDExLCJleHAiOjE3MzcwNTYwMTF9.7r6josuVPMKTaOAyIE1nZQxZVAtgNGxAOECp4SK8qME

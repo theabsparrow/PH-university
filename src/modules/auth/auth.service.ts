@@ -1,11 +1,15 @@
 import { TChangePassword, TLogin } from './auth.interface';
 import AppError from '../../error/AppError';
 import { StatusCodes } from 'http-status-codes';
-import { createToken, isUserExists } from './auth.utills';
+import {
+  createToken,
+  hashedPassrod,
+  isUserExists,
+  verifyToken,
+} from './auth.utills';
 import { User } from '../user/user.model';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
-import bcrypt from 'bcrypt';
 import { sendEmail } from '../../utills/sendEmail';
 import { TResetPassword } from '../user/user.interface';
 
@@ -64,6 +68,7 @@ const userLogin = async (payload: TLogin) => {
 const changePassword = async (user: JwtPayload, payload: TChangePassword) => {
   const { userID, userRole } = user;
   const { oldPassword, newPassword } = payload;
+  const saltNumber = Number(config.bcrypt_salt_round);
   const userInfo = await isUserExists(userID);
   // check if the user us exists
   if (!userInfo) {
@@ -91,10 +96,7 @@ const changePassword = async (user: JwtPayload, payload: TChangePassword) => {
   if (!passwordMatched) {
     throw new AppError(StatusCodes.FORBIDDEN, 'password is incorrect');
   }
-  const newHashedPassword = await bcrypt.hash(
-    newPassword,
-    Number(config.bcrypt_salt_round)
-  );
+  const newHashedPassword = await hashedPassrod(newPassword, saltNumber);
   await User.findOneAndUpdate(
     {
       id: userID,
@@ -112,10 +114,8 @@ const changePassword = async (user: JwtPayload, payload: TChangePassword) => {
 
 // generate refreshtoken
 const refreshToken = async (token: string) => {
-  const decoded = jwt.verify(
-    token,
-    config.jwt_refresh_secret as string
-  ) as JwtPayload;
+  const secret = config.jwt_refresh_secret as string;
+  const decoded = verifyToken(token, secret);
   const { userID, iat } = decoded;
   const userInfo = await isUserExists(userID);
   // check if the user us exists
@@ -188,13 +188,15 @@ const forgetPassword = async (id: string) => {
   const resetToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
-    '10m'
+    '30m'
   );
   const resetUILink = `${config.reset_pass_ui_link}?id=${userInfo.id}&token=${resetToken}`;
   sendEmail(userInfo.email, resetUILink);
 };
 
 const resetPassword = async (payload: TResetPassword, token: string) => {
+  const secret = config.jwt_access_secret as string;
+  const saltNumber = Number(config.bcrypt_salt_round);
   const userInfo = await isUserExists(payload?.id);
   // check if the user us exists
   if (!userInfo) {
@@ -216,6 +218,26 @@ const resetPassword = async (payload: TResetPassword, token: string) => {
   if (userStatus === 'blocked') {
     throw new AppError(StatusCodes.BAD_REQUEST, 'user is blocked');
   }
+  const decoded = verifyToken(token, secret);
+  const { userID, userRole } = decoded;
+  if (payload?.id !== userID) {
+    throw new AppError(StatusCodes.BAD_REQUEST, 'you are not authorized');
+  }
+  const newHashedPassword = await hashedPassrod(
+    payload?.newPassword,
+    saltNumber
+  );
+  await User.findOneAndUpdate(
+    {
+      id: userID,
+      role: userRole,
+    },
+    {
+      password: newHashedPassword,
+      passwordChangedAt: new Date(),
+    },
+    { new: true }
+  );
 };
 
 export const authService = {
