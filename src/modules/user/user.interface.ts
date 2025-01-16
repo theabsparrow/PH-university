@@ -4,6 +4,7 @@ import { USER_ROLE } from './user.constant';
 
 export interface Tuser {
   id: string;
+  email: string;
   password: string;
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;
@@ -22,4 +23,8 @@ export interface userModel extends Model<Tuser> {
   ): boolean;
 }
 
+export type TResetPassword = {
+  id: string;
+  newPassword: string;
+};
 export type TUserRole = keyof typeof USER_ROLE;

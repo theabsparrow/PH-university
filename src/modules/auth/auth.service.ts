@@ -6,6 +6,8 @@ import { User } from '../user/user.model';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import bcrypt from 'bcrypt';
+import { sendEmail } from '../../utills/sendEmail';
+import { TResetPassword } from '../user/user.interface';
 
 // user login
 const userLogin = async (payload: TLogin) => {
@@ -157,8 +159,69 @@ const refreshToken = async (token: string) => {
   return accessToken;
 };
 
+const forgetPassword = async (id: string) => {
+  const userInfo = await isUserExists(id);
+  // check if the user us exists
+  if (!userInfo) {
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      'Login failed. User ID is incorrect'
+    );
+  }
+  // check if the user is not deleted
+  const deleteUSer = userInfo?.isDeleted;
+  if (deleteUSer) {
+    throw new AppError(
+      StatusCodes.FORBIDDEN,
+      'login faild because the user is unavailable'
+    );
+  }
+  //   check if the user is blocked
+  const userStatus = userInfo?.status;
+  if (userStatus === 'blocked') {
+    throw new AppError(StatusCodes.BAD_REQUEST, 'user is blocked');
+  }
+  const jwtPayload = {
+    userID: userInfo?.id,
+    userRole: userInfo?.role,
+  };
+  const resetToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    '10m'
+  );
+  const resetUILink = `${config.reset_pass_ui_link}?id=${userInfo.id}&token=${resetToken}`;
+  sendEmail(userInfo.email, resetUILink);
+};
+
+const resetPassword = async (payload: TResetPassword, token: string) => {
+  const userInfo = await isUserExists(payload?.id);
+  // check if the user us exists
+  if (!userInfo) {
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      'Login failed. User ID is incorrect'
+    );
+  }
+  // check if the user is not deleted
+  const deleteUSer = userInfo?.isDeleted;
+  if (deleteUSer) {
+    throw new AppError(
+      StatusCodes.FORBIDDEN,
+      'login faild because the user is unavailable'
+    );
+  }
+  //   check if the user is blocked
+  const userStatus = userInfo?.status;
+  if (userStatus === 'blocked') {
+    throw new AppError(StatusCodes.BAD_REQUEST, 'user is blocked');
+  }
+};
+
 export const authService = {
   userLogin,
   changePassword,
   refreshToken,
+  forgetPassword,
+  resetPassword,
 };

@@ -23,6 +23,7 @@ const createStudent = async (password: string, payload: TStudent) => {
   const userData: Partial<Tuser> = {};
   userData.password = password || (config.default_pass as string);
   userData.role = 'student';
+  userData.email = payload.email;
 
   const admissionSemister = await AcademicSemister.findById(
     payload.admissionSemister
@@ -66,6 +67,8 @@ const createFAculty = async (password: string, payload: TFaculty) => {
   const userData: Partial<Tuser> = {};
   userData.password = password || config.default_pass;
   userData.role = 'faculty';
+  userData.email = payload.email;
+
   const isAcademicDepartmentExists = await AcademicDepartment.findById(
     payload?.academicDepartment
   );
@@ -105,6 +108,7 @@ const createAdmin = async (password: string, payload: TAdmin) => {
   const userData: Partial<Tuser> = {};
   userData.password = password;
   userData.role = 'admin';
+  userData.email = payload.email;
 
   const session = await mongoose.startSession();
   try {

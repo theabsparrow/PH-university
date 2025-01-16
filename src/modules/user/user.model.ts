@@ -12,6 +12,12 @@ const userSchema = new Schema<Tuser, userModel>(
       required: [true, 'ID is required'],
       unique: true,
     },
+    email: {
+      type: String,
+      trim: true,
+      // unique: true,
+      required: [true, 'email is required'],
+    },
     password: {
       type: String,
       required: [true, 'password is required'],
