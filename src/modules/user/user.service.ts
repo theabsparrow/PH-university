@@ -18,6 +18,7 @@ import { AcademicDepartment } from '../academicDepartment/academicDepartment.mod
 import { Faculty } from '../faculty/faculty.model';
 import { TAdmin } from '../admin/admin.interface';
 import { Admin } from '../admin/admin.model';
+import { uploadImage } from '../../utills/uploadImageToCloudinary';
 
 const createStudent = async (password: string, payload: TStudent) => {
   const userData: Partial<Tuser> = {};
@@ -40,7 +41,7 @@ const createStudent = async (password: string, payload: TStudent) => {
   try {
     session.startTransaction();
     userData.id = await generateStudentID(admissionSemister);
-
+    await uploadImage();
     const user = await User.create([userData], { session });
     if (!user.length) {
       throw new AppError(StatusCodes.BAD_REQUEST, 'user creation faild');
