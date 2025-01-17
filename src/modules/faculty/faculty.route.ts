@@ -8,12 +8,13 @@ import auth from '../../middlewire/auth';
 const router = Router();
 
 router.get('/', auth(USER_ROLE.admin), facultyController.getAllFaculty);
-router.get('/:id', facultyController.getSingleFaculty);
+router.get('/:id', auth(USER_ROLE.admin), facultyController.getSingleFaculty);
 router.patch(
   '/:id',
+  auth(USER_ROLE.faculty),
   validateRequest(facultyValidation.updateFacultyValidationSchema),
   facultyController.updateFaculty
 );
-router.delete('/:id', facultyController.deleteFaculty);
+router.delete('/:id', auth(USER_ROLE.admin), facultyController.deleteFaculty);
 
 export const facultyRoute = router;

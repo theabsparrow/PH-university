@@ -4,6 +4,7 @@ import { userService } from './user.service';
 import sendResponse from '../../utills/sendResponse';
 import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../utills/catchAsync';
+import { JwtPayload } from 'jsonwebtoken';
 
 const createStudent = catchAsync(async (req, res, next) => {
   const { password, student } = req.body;
@@ -37,8 +38,34 @@ const createAdmin = catchAsync(async (req, res, next) => {
     data: result,
   });
 });
+
+const getMe = catchAsync(async (req, res, next) => {
+  const payload = req.user as JwtPayload;
+  const result = await userService.getMe(payload);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.CREATED,
+    message: 'user is retirved successfully',
+    data: result,
+  });
+});
+
+const changeUserStatus = catchAsync(async (req, res, next) => {
+  const id = req.params.id;
+  const payload = req.body;
+  const result = await userService.changeUserStatus(id, payload);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.CREATED,
+    message: 'user status is changed successfully',
+    data: result,
+  });
+});
+
 export const userController = {
   createStudent,
   createFaculty,
   createAdmin,
+  getMe,
+  changeUserStatus,
 };

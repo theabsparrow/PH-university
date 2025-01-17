@@ -27,4 +27,9 @@ export type TResetPassword = {
   id: string;
   newPassword: string;
 };
+
+export type TStatus = 'in-progress' | 'blocked';
+export type TchangeStatus = {
+  status: TStatus;
+};
 export type TUserRole = keyof typeof USER_ROLE;

@@ -5,7 +5,7 @@ import AppError from '../../error/AppError';
 import { AcademicSemister } from '../academicSemister/academicSemister.model';
 import { TStudent } from '../student/student.interface';
 import { Student } from '../student/student.model';
-import { Tuser } from './user.interface';
+import { TchangeStatus, Tuser } from './user.interface';
 import { User } from './user.model';
 import {
   genearteAdminID,
@@ -138,8 +138,64 @@ const createAdmin = async (password: string, payload: TAdmin) => {
   }
 };
 
+const getMe = async (payload: Record<string, unknown>) => {
+  const { userID, userRole } = payload;
+  let result = null;
+  if (userRole === 'admin') {
+    result = await Admin.findOne({ id: userID }).populate('user');
+  }
+  if (userRole === 'faculty') {
+    result = await Faculty.findOne({ id: userID })
+      .populate('user')
+      .populate({
+        path: 'academicDepartment',
+        populate: {
+          path: 'academicFaculty',
+        },
+      });
+  }
+  if (userRole === 'student') {
+    result = await Student.findOne({ id: userID })
+      .populate('user')
+      .populate('admissionSemister')
+      .populate({
+        path: 'academicDepartment',
+        populate: {
+          path: 'academicFaculty',
+        },
+      });
+  }
+  return result;
+};
+
+const changeUserStatus = async (id: string, payload: TchangeStatus) => {
+  const isUserExists = await User.findById(id);
+  if (!isUserExists) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'this user does not exists');
+  }
+  const userIsDelete = isUserExists?.isDeleted;
+  if (userIsDelete) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'this user does not exists');
+  }
+  const userStatus = isUserExists?.status;
+  if (userStatus === payload?.status) {
+    throw new AppError(
+      StatusCodes.CONFLICT,
+      `this user status is already ${userStatus}`
+    );
+  }
+  const result = await User.findByIdAndUpdate(
+    id,
+    { status: payload?.status },
+    { new: true }
+  );
+  return result;
+};
+
 export const userService = {
   createStudent,
   createFAculty,
   createAdmin,
+  getMe,
+  changeUserStatus,
 };

@@ -6,6 +6,7 @@ import { studentValidation } from '../student/student.validation';
 import { USER_ROLE } from './user.constant';
 import { userController } from './user.controller';
 import { Router } from 'express';
+import { userValidation } from './user.validation';
 
 const router = Router();
 
@@ -30,4 +31,16 @@ router.post(
   userController.createAdmin
 );
 
+router.get(
+  '/me',
+  auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student),
+  userController.getMe
+);
+
+router.patch(
+  '/change-status/:id',
+  auth(USER_ROLE.admin),
+  validateRequest(userValidation.changeUserStatusValidationSchema),
+  userController.changeUserStatus
+);
 export const userRoute = router;
