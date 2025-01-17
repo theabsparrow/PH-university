@@ -7,12 +7,16 @@ import { USER_ROLE } from './user.constant';
 import { userController } from './user.controller';
 import { Router } from 'express';
 import { userValidation } from './user.validation';
+import { upload } from '../../utills/uploadImageToCloudinary';
+import { parseToJsonFormat } from '../../middlewire/parseJson';
 
 const router = Router();
 
 router.post(
   '/create-student',
   auth(USER_ROLE.admin),
+  upload.single('file'),
+  parseToJsonFormat,
   validateRequest(studentValidation.studentValidationSchema),
   userController.createStudent
 );
@@ -20,6 +24,8 @@ router.post(
 router.post(
   '/create-faculty',
   auth(USER_ROLE.admin),
+  upload.single('file'),
+  parseToJsonFormat,
   validateRequest(facultyValidation.facultyValidationSchema),
   userController.createFaculty
 );
@@ -27,6 +33,8 @@ router.post(
 router.post(
   '/create-admin',
   // auth(USER_ROLE.admin),
+  upload.single('file'),
+  parseToJsonFormat,
   validateRequest(adminValidation.adminValidationSchema),
   userController.createAdmin
 );

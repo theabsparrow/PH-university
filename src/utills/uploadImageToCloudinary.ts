@@ -1,21 +1,39 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { v2 as cloudinary } from 'cloudinary';
 import config from '../config';
-export const uploadImage = async () => {
-  cloudinary.config({
-    cloud_name: config.cloud_name,
-    api_key: config.cloud_api_key,
-    api_secret: config.cloud_api_secret,
-  });
+import multer from 'multer';
+import AppError from '../error/AppError';
+import { StatusCodes } from 'http-status-codes';
+import fs from 'fs/promises';
 
+cloudinary.config({
+  cloud_name: config.cloud_name,
+  api_key: config.cloud_api_key,
+  api_secret: config.cloud_api_secret,
+});
+
+export const uploadImage = async (imageName: string, path: string) => {
   try {
-    const uploadResult = await cloudinary.uploader.upload(
-      'https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg',
-      {
-        public_id: 'shoes',
-      }
-    );
-    console.log(uploadResult);
-  } catch (error) {
-    console.log(error);
+    const imageLink = await cloudinary.uploader.upload(path, {
+      public_id: imageName,
+    });
+    if (imageLink?.secure_url) {
+      await fs.unlink(path);
+      console.log('file deleted successfully');
+    }
+    return imageLink;
+  } catch (error: any) {
+    throw new AppError(StatusCodes.BAD_GATEWAY, error || 'image upload faild');
   }
 };
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, process.cwd() + '/uploads');
+  },
+  filename: function (req, file, cb) {
+    cb(null, file?.originalname);
+  },
+});
+
+export const upload = multer({ storage: storage });

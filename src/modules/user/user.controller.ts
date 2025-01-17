@@ -8,7 +8,8 @@ import { JwtPayload } from 'jsonwebtoken';
 
 const createStudent = catchAsync(async (req, res, next) => {
   const { password, student } = req.body;
-  const result = await userService.createStudent(password, student);
+  const imageFile = req.file;
+  const result = await userService.createStudent(password, student, imageFile);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.CREATED,
@@ -19,7 +20,8 @@ const createStudent = catchAsync(async (req, res, next) => {
 
 const createFaculty = catchAsync(async (req, res, next) => {
   const { password, faculty } = req.body;
-  const result = await userService.createFAculty(password, faculty);
+  const imageFile = req.file;
+  const result = await userService.createFAculty(password, faculty, imageFile);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.CREATED,
@@ -30,7 +32,8 @@ const createFaculty = catchAsync(async (req, res, next) => {
 
 const createAdmin = catchAsync(async (req, res, next) => {
   const { password, admin } = req.body;
-  const result = await userService.createAdmin(password, admin);
+  const imageFile = req.file;
+  const result = await userService.createAdmin(password, admin, imageFile);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.CREATED,

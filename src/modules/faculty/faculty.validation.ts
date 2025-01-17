@@ -42,7 +42,6 @@ const facultyValidationSchema = z.object({
     academicDepartment: z.string({
       invalid_type_error: 'academic department is required',
     }),
-    profileImage: z.string().optional(),
   }),
 });
 
@@ -83,7 +82,6 @@ const updateFacultyValidationSchema = z.object({
         invalid_type_error: 'academic department is required',
       })
       .optional(),
-    profileImage: z.string().optional().optional(),
   }),
 });
 
