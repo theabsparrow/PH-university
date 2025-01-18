@@ -71,8 +71,7 @@ const forgrtPassword = catchAsync(
 const resetPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const payload = req.body;
-    const token = req?.headers?.authorization as string;
-    const result = await authService.resetPassword(payload, token);
+    const result = await authService.resetPassword(payload, req.user);
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,

@@ -70,26 +70,6 @@ const changePassword = async (user: JwtPayload, payload: TChangePassword) => {
   const { oldPassword, newPassword } = payload;
   const saltNumber = Number(config.bcrypt_salt_round);
   const userInfo = await isUserExists(userID);
-  // check if the user us exists
-  if (!userInfo) {
-    throw new AppError(
-      StatusCodes.NOT_FOUND,
-      'Login failed. User ID is incorrect'
-    );
-  }
-  // check if the user is not deleted
-  const deleteUSer = userInfo?.isDeleted;
-  if (deleteUSer) {
-    throw new AppError(
-      StatusCodes.FORBIDDEN,
-      'login faild because the user is unavailable'
-    );
-  }
-  //   check if the user is blocked
-  const userStatus = userInfo?.status;
-  if (userStatus === 'blocked') {
-    throw new AppError(StatusCodes.BAD_REQUEST, 'user is blocked');
-  }
   //   check the password
   const userPass = userInfo?.password as string;
   const passwordMatched = await User.isPasswordMatched(oldPassword, userPass);
@@ -194,32 +174,9 @@ const forgetPassword = async (id: string) => {
   sendEmail(userInfo.email, resetUILink);
 };
 
-const resetPassword = async (payload: TResetPassword, token: string) => {
-  const secret = config.jwt_access_secret as string;
+const resetPassword = async (payload: TResetPassword, user: JwtPayload) => {
   const saltNumber = Number(config.bcrypt_salt_round);
-  const userInfo = await isUserExists(payload?.id);
-  // check if the user us exists
-  if (!userInfo) {
-    throw new AppError(
-      StatusCodes.NOT_FOUND,
-      'Login failed. User ID is incorrect'
-    );
-  }
-  // check if the user is not deleted
-  const deleteUSer = userInfo?.isDeleted;
-  if (deleteUSer) {
-    throw new AppError(
-      StatusCodes.FORBIDDEN,
-      'login faild because the user is unavailable'
-    );
-  }
-  //   check if the user is blocked
-  const userStatus = userInfo?.status;
-  if (userStatus === 'blocked') {
-    throw new AppError(StatusCodes.BAD_REQUEST, 'user is blocked');
-  }
-  const decoded = verifyToken(token, secret);
-  const { userID, userRole } = decoded;
+  const { userID, userRole } = user;
   if (payload?.id !== userID) {
     throw new AppError(StatusCodes.BAD_REQUEST, 'you are not authorized');
   }

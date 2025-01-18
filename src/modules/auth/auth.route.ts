@@ -33,6 +33,7 @@ router.post(
 
 router.post(
   '/reset-password',
+  auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student),
   validateRequest(loginValidation.resetPasswordValidationSchema),
   authController.resetPassword
 );

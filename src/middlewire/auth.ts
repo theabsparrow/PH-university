@@ -27,7 +27,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
     if (!userInfo) {
       throw new AppError(
         StatusCodes.NOT_FOUND,
-        'Login failed. User ID is incorrect'
+        ' User does not exists'
       );
     }
     // check if the user is not deleted
@@ -35,7 +35,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
     if (deleteUSer) {
       throw new AppError(
         StatusCodes.FORBIDDEN,
-        'login faild because the user is unavailable'
+        ' User does not exists'
       );
     }
     //   check if the user is blocked

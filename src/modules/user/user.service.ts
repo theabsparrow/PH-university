@@ -69,7 +69,11 @@ const createStudent = async (
   }
 };
 
-const createFAculty = async (password: string, payload: TFaculty, file: any) => {
+const createFAculty = async (
+  password: string,
+  payload: TFaculty,
+  file: any
+) => {
   const userData: Partial<Tuser> = {};
   userData.password = password || config.default_pass;
   userData.role = 'faculty';
