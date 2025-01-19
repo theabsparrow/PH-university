@@ -2,14 +2,13 @@
 import { StatusCodes } from 'http-status-codes';
 import AppError from '../../error/AppError';
 import { OfferedCourse } from '../offeredCourse/offeredCourse.model';
-import { TEnrolledCourse } from './enrolledCourse.interface';
+import { TCourseMarks, TEnrolledCourse } from './enrolledCourse.interface';
 import { Student } from '../student/student.model';
 import { EnrolledCourse } from './enrolledCourse.model';
 import mongoose, { Types } from 'mongoose';
 import { SemisterRegistration } from '../semisterRegistration/semisterRegistration.model';
 import { Course } from '../course/course.model';
-import { getOfferCourse } from './enrolledCourse.utills';
-
+import { calculateGradeAndPoints, getOfferCourse } from './enrolledCourse.utills';
 
 const createEnrolledCourse = async (
   payload: TEnrolledCourse,
@@ -160,19 +159,69 @@ const updateEnrolledCourseMarks = async (
   if (!isStudentExists) {
     throw new AppError(StatusCodes.BAD_GATEWAY, 'student does not exists');
   }
-  const modifiedMarksData: Record<string, unknown> = {
-    ...courseMarks,
-  };
+  const enrolledCourseExists = await EnrolledCourse.findById(enrolledCourseID);
+  const { classTest1, midTerm, classTest2 } =
+    enrolledCourseExists?.courseMarks as TCourseMarks;
+  const modifiedMarksData: Record<string, unknown> = {};
+
   if (courseMarks && Object.keys(courseMarks).length) {
     for (const [key, value] of Object.entries(courseMarks)) {
       modifiedMarksData[`courseMarks.${key}`] = value;
     }
   }
+  // check if the class test 1 mark is updated first
+  if (
+    !classTest1 &&
+    Object.keys(modifiedMarksData).length &&
+    !Object.keys(modifiedMarksData).includes('courseMarks.classTest1')
+  ) {
+    throw new AppError(
+      StatusCodes.BAD_GATEWAY,
+      'you have to update the class test 1 marks first'
+    );
+  }
+  // check if the mid term mark is updated second
+  else if (
+    !midTerm &&
+    Object.keys(modifiedMarksData).length &&
+    !Object.keys(modifiedMarksData).includes('courseMarks.midTerm') &&
+    (Object.keys(modifiedMarksData).includes('courseMarks.classTest2') ||
+      Object.keys(modifiedMarksData).includes('courseMarks.finalTerm'))
+  ) {
+    throw new AppError(
+      StatusCodes.BAD_GATEWAY,
+      'you have to update the mid term marks first'
+    );
+  }
+  // check if the class test mark is updated last
+  else if (
+    !classTest2 &&
+    Object.keys(modifiedMarksData).length &&
+    !Object.keys(modifiedMarksData).includes('courseMarks.classTest2') &&
+    Object.keys(modifiedMarksData).includes('courseMarks.finalTerm')
+  ) {
+    throw new AppError(
+      StatusCodes.BAD_GATEWAY,
+      'you have to update the class test 2 marks first'
+    );
+  }
+
   const result = await EnrolledCourse.findByIdAndUpdate(
     enrolledCourseID,
     modifiedMarksData,
     { new: true }
   );
+  const newMarksData = await EnrolledCourse.findById(enrolledCourseID).select('courseMarks')
+
+  if (newMarksData?.courseMarks.finalTerm) {
+    const totalMarks =
+      Math.ceil(newMarksData?.courseMarks.classTest1 * 0.1) +
+      Math.ceil(newMarksData?.courseMarks.midTerm * 0.3) +
+      Math.ceil(newMarksData?.courseMarks.classTest2 * 0.1) +
+      Math.ceil(newMarksData?.courseMarks.finalTerm * 0.5);
+      calculateGradeAndPoints(totalMarks);
+  
+  }
   return result;
 };
 export const enrolledCourseService = {
