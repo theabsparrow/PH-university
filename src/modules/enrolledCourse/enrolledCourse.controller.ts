@@ -5,6 +5,8 @@ import catchAsync from '../../utills/catchAsync';
 import { enrolledCourseService } from './enrolledCourse.service';
 import sendResponse from '../../utills/sendResponse';
 import { StatusCodes } from 'http-status-codes';
+import { JwtPayload } from 'jsonwebtoken';
+import { Types } from 'mongoose';
 
 const createEnrolledCourse = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -20,6 +22,18 @@ const createEnrolledCourse = catchAsync(
   }
 );
 
+const updateEnrolledCourseMarks = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+const payload = req.body;
+const enrolledCourseID = req.enrolledCourseID as Types.ObjectId
+const result = await enrolledCourseService.updateEnrolledCourseMarks(payload, enrolledCourseID);
+sendResponse(res, {
+  success: true,
+  statusCode: StatusCodes.CREATED,
+  message: 'enrolled course marks updated successfully',
+  data: result,
+});
+})
 export const enrolledCourseController = {
   createEnrolledCourse,
+  updateEnrolledCourseMarks
 };

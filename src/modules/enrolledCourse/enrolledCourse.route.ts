@@ -4,6 +4,7 @@ import { enrolledCourseValidation } from './enrolledCourse.validation';
 import { enrolledCourseController } from './enrolledCourse.controller';
 import auth from '../../middlewire/auth';
 import { USER_ROLE } from '../user/user.constant';
+import { matchEnrolledCourseFaculty } from '../../middlewire/enrolledCourse.faculty';
 
 const router = Router();
 router.post(
@@ -13,4 +14,13 @@ router.post(
   enrolledCourseController.createEnrolledCourse
 );
 
+router.patch(
+  '/update-enrolled-course-marks',
+  auth(USER_ROLE.faculty),
+  validateRequest(
+    enrolledCourseValidation.updateEnrolledCourseValidationSchema
+  ),
+  matchEnrolledCourseFaculty(),
+  enrolledCourseController.updateEnrolledCourseMarks
+);
 export const enrolledCourseRoute = router;

@@ -85,7 +85,6 @@ const createFAculty = async (
   if (!isAcademicDepartmentExists) {
     throw new AppError(StatusCodes.NOT_FOUND, 'Academic department not found');
   }
-
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
@@ -93,6 +92,7 @@ const createFAculty = async (
     const imageName = file?.originalname;
     const imagePath = file?.path;
     const imageURL = await uploadImage(imageName, imagePath);
+
     const newUser = await User.create([userData], { session });
     if (!newUser.length) {
       throw new AppError(StatusCodes.BAD_REQUEST, 'faild to create user');

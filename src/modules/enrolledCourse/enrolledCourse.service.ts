@@ -8,20 +8,15 @@ import { EnrolledCourse } from './enrolledCourse.model';
 import mongoose, { Types } from 'mongoose';
 import { SemisterRegistration } from '../semisterRegistration/semisterRegistration.model';
 import { Course } from '../course/course.model';
+import { getOfferCourse } from './enrolledCourse.utills';
+
 
 const createEnrolledCourse = async (
   payload: TEnrolledCourse,
   userID: string
 ) => {
   const { offeredCourse } = payload;
-  const isOfferedCourseExists = await OfferedCourse.findById(offeredCourse);
-  // check if the offer course is exists
-  if (!isOfferedCourseExists) {
-    throw new AppError(
-      StatusCodes.NOT_FOUND,
-      'this offer course does not exists'
-    );
-  }
+  const isOfferedCourseExists = await getOfferCourse(offeredCourse);
   const maxCapacity = isOfferedCourseExists?.maxCapacity;
   const semisterRegistration = isOfferedCourseExists?.semisterRegistration;
   // check if the max capacity is available
@@ -60,7 +55,6 @@ const createEnrolledCourse = async (
   const courseID = isOfferedCourseExists?.course;
   const isCourseExists = await Course.findById(courseID).select('credit');
   const newEnrolledCredit = isCourseExists?.credit;
-
   // check if the max credit is not larger than the course credit
   const enrolledCourse = await EnrolledCourse.aggregate([
     {
@@ -101,6 +95,7 @@ const createEnrolledCourse = async (
       'you have exceeded maximum number of credits'
     );
   }
+  // transaction rollback starts
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
@@ -143,6 +138,44 @@ const createEnrolledCourse = async (
   }
 };
 
+const updateEnrolledCourseMarks = async (
+  payload: Partial<TEnrolledCourse>,
+  enrolledCourseID: Types.ObjectId
+) => {
+  const { semisterRegistration, offeredCourse, student, courseMarks } = payload;
+  // check if the semister registration exists
+  const isSemisterRegistrationExists = await SemisterRegistration.findById(
+    semisterRegistration
+  );
+  if (!isSemisterRegistrationExists) {
+    throw new AppError(
+      StatusCodes.BAD_GATEWAY,
+      'semister resgistration does not exists'
+    );
+  }
+  // check if the offered course exists
+  await getOfferCourse(offeredCourse!);
+  //  check if the student is wxists
+  const isStudentExists = await Student.findById(student);
+  if (!isStudentExists) {
+    throw new AppError(StatusCodes.BAD_GATEWAY, 'student does not exists');
+  }
+  const modifiedMarksData: Record<string, unknown> = {
+    ...courseMarks,
+  };
+  if (courseMarks && Object.keys(courseMarks).length) {
+    for (const [key, value] of Object.entries(courseMarks)) {
+      modifiedMarksData[`courseMarks.${key}`] = value;
+    }
+  }
+  const result = await EnrolledCourse.findByIdAndUpdate(
+    enrolledCourseID,
+    modifiedMarksData,
+    { new: true }
+  );
+  return result;
+};
 export const enrolledCourseService = {
   createEnrolledCourse,
+  updateEnrolledCourseMarks,
 };
