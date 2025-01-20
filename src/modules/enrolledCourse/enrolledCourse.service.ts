@@ -8,7 +8,10 @@ import { EnrolledCourse } from './enrolledCourse.model';
 import mongoose, { Types } from 'mongoose';
 import { SemisterRegistration } from '../semisterRegistration/semisterRegistration.model';
 import { Course } from '../course/course.model';
-import { calculateGradeAndPoints, getOfferCourse } from './enrolledCourse.utills';
+import {
+  calculateGradeAndPoints,
+  getOfferCourse,
+} from './enrolledCourse.utills';
 
 const createEnrolledCourse = async (
   payload: TEnrolledCourse,
@@ -142,6 +145,9 @@ const updateEnrolledCourseMarks = async (
   enrolledCourseID: Types.ObjectId
 ) => {
   const { semisterRegistration, offeredCourse, student, courseMarks } = payload;
+  const enrolledCourseExists = await EnrolledCourse.findById(enrolledCourseID);
+  const { classTest1, midTerm, classTest2, finalTerm } =
+    enrolledCourseExists?.courseMarks as TCourseMarks;
   // check if the semister registration exists
   const isSemisterRegistrationExists = await SemisterRegistration.findById(
     semisterRegistration
@@ -159,9 +165,6 @@ const updateEnrolledCourseMarks = async (
   if (!isStudentExists) {
     throw new AppError(StatusCodes.BAD_GATEWAY, 'student does not exists');
   }
-  const enrolledCourseExists = await EnrolledCourse.findById(enrolledCourseID);
-  const { classTest1, midTerm, classTest2 } =
-    enrolledCourseExists?.courseMarks as TCourseMarks;
   const modifiedMarksData: Record<string, unknown> = {};
 
   if (courseMarks && Object.keys(courseMarks).length) {
@@ -206,22 +209,22 @@ const updateEnrolledCourseMarks = async (
     );
   }
 
+  if (courseMarks?.finalTerm) {
+    const totalMarks =
+      Math.ceil(classTest1 * 0.1 || courseMarks?.classTest1 * 0.1) +
+      Math.ceil(midTerm * 0.3 || courseMarks?.midTerm * 0.3) +
+      Math.ceil(classTest2 * 0.1 || courseMarks?.classTest2 * 0.1) +
+      Math.ceil(finalTerm * 0.5 || courseMarks?.finalTerm * 0.5);
+    const result = calculateGradeAndPoints(totalMarks);
+    modifiedMarksData.grade = result?.grade;
+    modifiedMarksData.gradePoints = result?.gradePoints;
+    modifiedMarksData.isCompleted = true;
+  }
   const result = await EnrolledCourse.findByIdAndUpdate(
     enrolledCourseID,
     modifiedMarksData,
     { new: true }
   );
-  const newMarksData = await EnrolledCourse.findById(enrolledCourseID).select('courseMarks')
-
-  if (newMarksData?.courseMarks.finalTerm) {
-    const totalMarks =
-      Math.ceil(newMarksData?.courseMarks.classTest1 * 0.1) +
-      Math.ceil(newMarksData?.courseMarks.midTerm * 0.3) +
-      Math.ceil(newMarksData?.courseMarks.classTest2 * 0.1) +
-      Math.ceil(newMarksData?.courseMarks.finalTerm * 0.5);
-      calculateGradeAndPoints(totalMarks);
-  
-  }
   return result;
 };
 export const enrolledCourseService = {
