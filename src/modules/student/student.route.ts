@@ -4,6 +4,8 @@ import validateRequest from '../../middlewire/validateRequest';
 import { studentValidation } from './student.validation';
 import auth from '../../middlewire/auth';
 import { USER_ROLE } from '../user/user.constant';
+import { upload } from '../../utills/uploadImageToCloudinary';
+import { parseToJsonFormat } from '../../middlewire/parseJson';
 
 const router = Router();
 
@@ -25,6 +27,8 @@ router.delete(
 router.patch(
   '/:id',
   auth(USER_ROLE.student, USER_ROLE.superAdmin),
+  upload.single('file'),
+  parseToJsonFormat,
   validateRequest(studentValidation.updateStudentValidationSchema),
   studentController.updateStudent
 );

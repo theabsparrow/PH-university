@@ -6,6 +6,7 @@ import { User } from '../user/user.model';
 import mongoose from 'mongoose';
 import { TFaculty } from './faculty.interface';
 import { SearchableFields } from '../../global/constant';
+import { uploadImage } from '../../utills/uploadImageToCloudinary';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 const getAllFaculty = async (query: Record<string, unknown>) => {
@@ -85,7 +86,11 @@ const deleteFaculty = async (id: string) => {
   }
 };
 
-const updateFaculty = async (id: string, payload: Partial<TFaculty>) => {
+const updateFaculty = async (
+  id: string,
+  payload: Partial<TFaculty>,
+  file: any
+) => {
   const isFacultyExist = await Faculty.findById(id);
   if (!isFacultyExist || isFacultyExist?.isDeleted) {
     throw new AppError(StatusCodes.NOT_FOUND, 'this faculty doesn`t exist');
@@ -96,7 +101,12 @@ const updateFaculty = async (id: string, payload: Partial<TFaculty>) => {
   if (!isFacultyBlocked || isFacultyBlocked?.status !== 'in-progress') {
     throw new AppError(StatusCodes.BAD_REQUEST, 'This Faculty is blocked');
   }
-
+  if (file) {
+    const imageName = file?.originalname;
+    const imagePath = file?.path;
+    const imageURL = await uploadImage(imageName, imagePath);
+    payload.profileImage = imageURL?.secure_url;
+  }
   const { name, ...remainingStudent } = payload;
   const modifiedData: Record<string, unknown> = { ...remainingStudent };
 

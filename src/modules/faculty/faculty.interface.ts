@@ -16,5 +16,6 @@ export type TFaculty = {
   parmanentAddress: string;
   profileImage?: string;
   academicDepartment: Types.ObjectId;
+  academicFaculty: Types.ObjectId;
   isDeleted: boolean;
 };

@@ -49,7 +49,8 @@ const updateStudent = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
     const payload = req.body.student;
-    const result = await studentService.updateStudent(id, payload);
+    const imageFile = req.file;
+    const result = await studentService.updateStudent(id, payload, imageFile);
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,

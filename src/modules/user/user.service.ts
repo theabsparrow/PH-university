@@ -40,20 +40,36 @@ const createStudent = async (
     );
   }
 
+  const academicDepartmentExists = await AcademicDepartment.findById(
+    payload.academicDepartment
+  );
+  if (!academicDepartmentExists) {
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      'Admission department does not found'
+    );
+  }
+  const academicFaculty = academicDepartmentExists?.academicFaculty;
+  payload.academicFaculty = academicFaculty;
+
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
     userData.id = await generateStudentID(admissionSemister);
-    const imageName = file?.originalname;
-    const imagePath = file?.path;
-    const imageURL = await uploadImage(imageName, imagePath);
+    if (file) {
+      const imageName = file?.originalname;
+      const imagePath = file?.path;
+      const imageURL = await uploadImage(imageName, imagePath);
+      payload.profileImage = imageURL?.secure_url;
+    }
+
     const user = await User.create([userData], { session });
     if (!user.length) {
       throw new AppError(StatusCodes.BAD_REQUEST, 'user creation faild');
     }
     payload.id = user[0].id;
     payload.user = user[0]._id;
-    payload.profileImage = imageURL?.secure_url;
+
     const student = await Student.create([payload], { session });
     if (!student) {
       throw new AppError(StatusCodes.BAD_REQUEST, 'student creation faild');
@@ -85,13 +101,18 @@ const createFAculty = async (
   if (!isAcademicDepartmentExists) {
     throw new AppError(StatusCodes.NOT_FOUND, 'Academic department not found');
   }
+  const academicFaculty = isAcademicDepartmentExists?.academicFaculty;
+  payload.academicFaculty = academicFaculty;
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
     userData.id = await generateFacultyID();
-    const imageName = file?.originalname;
-    const imagePath = file?.path;
-    const imageURL = await uploadImage(imageName, imagePath);
+    if (file) {
+      const imageName = file?.originalname;
+      const imagePath = file?.path;
+      const imageURL = await uploadImage(imageName, imagePath);
+      payload.profileImage = imageURL?.secure_url;
+    }
 
     const newUser = await User.create([userData], { session });
     if (!newUser.length) {
@@ -99,7 +120,7 @@ const createFAculty = async (
     }
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id;
-    payload.profileImage = imageURL?.secure_url;
+
     const newFAculty = await Faculty.create([payload], { session });
     if (!newFAculty.length) {
       throw new AppError(StatusCodes.BAD_REQUEST, 'faild to create students');
@@ -125,9 +146,13 @@ const createAdmin = async (password: string, payload: TAdmin, file: any) => {
   try {
     session.startTransaction();
     userData.id = await genearteAdminID();
-    const imageName = file?.originalname;
-    const imagePath = file?.path;
-    const imageURL = await uploadImage(imageName, imagePath);
+    if (file) {
+      const imageName = file?.originalname;
+      const imagePath = file?.path;
+      const imageURL = await uploadImage(imageName, imagePath);
+      payload.profileImage = imageURL?.secure_url;
+    }
+
     const newUser = await User.create([userData], { session });
     if (!newUser.length) {
       throw new AppError(StatusCodes.BAD_REQUEST, 'faild to create user');
@@ -135,7 +160,7 @@ const createAdmin = async (password: string, payload: TAdmin, file: any) => {
 
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id;
-    payload.profileImage = imageURL?.secure_url;
+
     const newAdmin = await Admin.create([payload], { session });
     if (!newAdmin.length) {
       throw new AppError(StatusCodes.BAD_REQUEST, 'faild to create students');

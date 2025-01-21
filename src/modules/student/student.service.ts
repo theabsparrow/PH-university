@@ -7,6 +7,7 @@ import { User } from '../user/user.model';
 import { TStudent } from './student.interface';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { SearchableFields } from '../../global/constant';
+import { uploadImage } from '../../utills/uploadImageToCloudinary';
 
 const getAllStudent = async (query: Record<string, unknown>) => {
   // const queryObject = { ...query };
@@ -151,7 +152,11 @@ const deleteStudent = async (id: string) => {
   }
 };
 
-const updateStudent = async (id: string, payload: Partial<TStudent>) => {
+const updateStudent = async (
+  id: string,
+  payload: Partial<TStudent>,
+  file: any
+) => {
   const isStudentExist = await Student.findOne({ id });
   if (!isStudentExist || isStudentExist?.isDeleted) {
     throw new AppError(StatusCodes.NOT_FOUND, 'this student doesn`t exist');
@@ -159,6 +164,12 @@ const updateStudent = async (id: string, payload: Partial<TStudent>) => {
   const isStudentBlocked = await User.findOne({ id });
   if (!isStudentBlocked || isStudentBlocked?.status !== 'in-progress') {
     throw new AppError(StatusCodes.BAD_REQUEST, 'This student is blocked');
+  }
+  if (file) {
+    const imageName = file?.originalname;
+    const imagePath = file?.path;
+    const imageURL = await uploadImage(imageName, imagePath);
+    payload.profileImage = imageURL?.secure_url;
   }
 
   const { name, guardian, localGuardian, ...remainingStudent } = payload;

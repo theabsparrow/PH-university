@@ -36,7 +36,8 @@ const updateAdmin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
     const payload = req.body.admin;
-    const result = await adminService.updateAdmin(id, payload);
+    const imageFile = req.file;
+    const result = await adminService.updateAdmin(id, payload, imageFile);
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,

@@ -6,6 +6,7 @@ import { Admin } from './admin.model';
 import { User } from '../user/user.model';
 import mongoose from 'mongoose';
 import { TAdmin } from './admin.interface';
+import { uploadImage } from '../../utills/uploadImageToCloudinary';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 const getAllAdmin = async (query: Record<string, unknown>) => {
@@ -67,7 +68,7 @@ const deleteAdmin = async (id: string) => {
   }
 };
 
-const updateAdmin = async (id: string, payload: Partial<TAdmin>) => {
+const updateAdmin = async (id: string, payload: Partial<TAdmin>, file: any) => {
   const isAdminExist = await Admin.findById(id);
   if (!isAdminExist || isAdminExist?.isDeleted) {
     throw new AppError(StatusCodes.NOT_FOUND, 'this faculty doesn`t exist');
@@ -78,7 +79,12 @@ const updateAdmin = async (id: string, payload: Partial<TAdmin>) => {
   if (!isAdminBlocked || isAdminBlocked?.status !== 'in-progress') {
     throw new AppError(StatusCodes.BAD_REQUEST, 'This Faculty is blocked');
   }
-
+  if (file) {
+    const imageName = file?.originalname;
+    const imagePath = file?.path;
+    const imageURL = await uploadImage(imageName, imagePath);
+    payload.profileImage = imageURL?.secure_url;
+  }
   const { name, ...remainingStudent } = payload;
   const modifiedData: Record<string, unknown> = { ...remainingStudent };
 

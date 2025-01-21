@@ -37,7 +37,8 @@ const updateFaculty = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
     const payload = req.body.faculty;
-    const result = await facultyService.updateFaculty(id, payload);
+    const imageFile = req.file;
+    const result = await facultyService.updateFaculty(id, payload, imageFile);
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,
