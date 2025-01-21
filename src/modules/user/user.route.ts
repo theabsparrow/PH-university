@@ -14,7 +14,7 @@ const router = Router();
 
 router.post(
   '/create-student',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.superAdmin,USER_ROLE.admin),
   upload.single('file'),
   parseToJsonFormat,
   validateRequest(studentValidation.studentValidationSchema),
@@ -23,7 +23,7 @@ router.post(
 
 router.post(
   '/create-faculty',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.superAdmin,USER_ROLE.admin),
   upload.single('file'),
   parseToJsonFormat,
   validateRequest(facultyValidation.facultyValidationSchema),
@@ -32,7 +32,7 @@ router.post(
 
 router.post(
   '/create-admin',
-  // auth(USER_ROLE.admin),
+  auth(USER_ROLE.superAdmin),
   upload.single('file'),
   parseToJsonFormat,
   validateRequest(adminValidation.adminValidationSchema),
@@ -41,13 +41,13 @@ router.post(
 
 router.get(
   '/me',
-  auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student),
+  auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student, USER_ROLE.superAdmin),
   userController.getMe
 );
 
 router.patch(
   '/change-status/:id',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   validateRequest(userValidation.changeUserStatusValidationSchema),
   userController.changeUserStatus
 );

@@ -7,14 +7,14 @@ import auth from '../../middlewire/auth';
 
 const router = Router();
 
-router.get('/', auth(USER_ROLE.admin), facultyController.getAllFaculty);
-router.get('/:id', auth(USER_ROLE.admin), facultyController.getSingleFaculty);
+router.get('/', auth(USER_ROLE.admin, USER_ROLE.superAdmin), facultyController.getAllFaculty);
+router.get('/:id', auth(USER_ROLE.admin, USER_ROLE.superAdmin), facultyController.getSingleFaculty);
 router.patch(
   '/:id',
-  auth(USER_ROLE.faculty),
+  auth(USER_ROLE.faculty, USER_ROLE.superAdmin),
   validateRequest(facultyValidation.updateFacultyValidationSchema),
   facultyController.updateFaculty
 );
-router.delete('/:id', auth(USER_ROLE.admin), facultyController.deleteFaculty);
+router.delete('/:id', auth(USER_ROLE.admin, USER_ROLE.superAdmin), facultyController.deleteFaculty);
 
 export const facultyRoute = router;
