@@ -6,19 +6,18 @@ import {
   TUpdateOfferedCourse,
 } from './offeredCourse.interface';
 import { OfferedCourse } from './offeredCourse.model';
-import { AcademicFaculty } from '../academicFaculty/academicFaculty.Model';
 import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
 import { Course } from '../course/course.model';
 import { Faculty } from '../faculty/faculty.model';
 import { hasTimeConflict } from './offeredCourse.utills';
 import { registrationStatus } from '../semisterRegistration/semisterRegistration.constant';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { Student } from '../student/student.model';
 
 // create offered course
 const createOfferedCourse = async (payload: TOfferedCourse) => {
   const {
     semisterRegistration,
-    academicFaculty,
     academicDepartment,
     course,
     faculty,
@@ -45,18 +44,6 @@ const createOfferedCourse = async (payload: TOfferedCourse) => {
     );
   }
   const academicSemister = isSemisterRegistrationExists?.academicSemister;
-
-  //   check if the academic faculty is exist
-  const isAcademicFacultyExists = await AcademicFaculty.findById(
-    academicFaculty
-  );
-  if (!isAcademicFacultyExists) {
-    throw new AppError(
-      StatusCodes.NOT_FOUND,
-      'this academic faculty is not found'
-    );
-  }
-
   //   check if the academic department is exist
   const isAcademicDepartmentExists = await AcademicDepartment.findById(
     academicDepartment
@@ -67,31 +54,18 @@ const createOfferedCourse = async (payload: TOfferedCourse) => {
       'this academic department is not found'
     );
   }
-
+  const academicFaculty = isAcademicDepartmentExists?.academicFaculty;
+  payload.academicFaculty = academicFaculty;
   //   check if the course is exist
   const isCourseExists = await Course.findById(course);
   if (!isCourseExists) {
     throw new AppError(StatusCodes.NOT_FOUND, 'this course is not found');
   }
-
   //   check if the faculty is exist
   const isfacultyExists = await Faculty.findById(faculty);
   if (!isfacultyExists) {
     throw new AppError(StatusCodes.NOT_FOUND, 'this faculty is not found');
   }
-
-  // check if the academic department exists in the academic faculty
-  const isDepartmentBelongToTheFaculty = await AcademicDepartment.findOne({
-    _id: academicDepartment,
-    academicFaculty,
-  });
-  if (!isDepartmentBelongToTheFaculty) {
-    throw new AppError(
-      StatusCodes.NOT_FOUND,
-      `the ${isAcademicDepartmentExists.name} is not belong to the ${isAcademicFacultyExists.name}`
-    );
-  }
-
   // check if the faculty schedule is assigned before
   const assignedFacultySchedule = await OfferedCourse.find({
     semisterRegistration,
@@ -110,7 +84,6 @@ const createOfferedCourse = async (payload: TOfferedCourse) => {
       'the faculty is not available at this time'
     );
   }
-
   // final result
   const result = await OfferedCourse.create({ ...payload, academicSemister });
   return result;
@@ -125,6 +98,11 @@ const getAllOfferedCourse = async (query: Record<string, unknown>) => {
     .fields();
   const result = await allOfferedCourseQuery.modelQuery;
   return result;
+};
+
+const getMyOfferedCourse = async (id: string) => {
+  const isStudentExists = await Student.findOne({ id: id });
+  return isStudentExists;
 };
 
 // get a single offered course
@@ -228,4 +206,5 @@ export const offeredCourseService = {
   getASingleOfferedCourse,
   updatedOfferCourse,
   deleteOfferedCourse,
+  getMyOfferedCourse,
 };

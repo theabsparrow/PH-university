@@ -13,7 +13,6 @@ const timeStringSchema = z.string().refine(
 
 const offeredCourseValidationSchema = z.object({
   semisterRegistration: z.string(),
-  academicFaculty: z.string(),
   academicDepartment: z.string(),
   course: z.string(),
   faculty: z.string(),

@@ -12,7 +12,10 @@ const createEnrolledCourse = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const payload = req.body;
     const { userID } = req.user;
-    const result = await enrolledCourseService.createEnrolledCourse(payload, userID);
+    const result = await enrolledCourseService.createEnrolledCourse(
+      payload,
+      userID
+    );
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.CREATED,
@@ -22,18 +25,42 @@ const createEnrolledCourse = catchAsync(
   }
 );
 
-const updateEnrolledCourseMarks = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-const payload = req.body;
-const enrolledCourseID = req.enrolledCourseID as Types.ObjectId
-const result = await enrolledCourseService.updateEnrolledCourseMarks(payload, enrolledCourseID);
-sendResponse(res, {
-  success: true,
-  statusCode: StatusCodes.CREATED,
-  message: 'enrolled course marks updated successfully',
-  data: result,
-});
-})
+const getMyEnrolledCourse = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user;
+    const { userID } = user;
+    const query = req.query;
+    const result = await enrolledCourseService.getMyEnrolledCourse(
+      userID,
+      query
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.CREATED,
+      message: 'my enrolled course retrived successfully',
+      data: result,
+    });
+  }
+);
+
+const updateEnrolledCourseMarks = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const payload = req.body;
+    const enrolledCourseID = req.enrolledCourseID as Types.ObjectId;
+    const result = await enrolledCourseService.updateEnrolledCourseMarks(
+      payload,
+      enrolledCourseID
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.CREATED,
+      message: 'enrolled course marks updated successfully',
+      data: result,
+    });
+  }
+);
 export const enrolledCourseController = {
   createEnrolledCourse,
-  updateEnrolledCourseMarks
+  updateEnrolledCourseMarks,
+  getMyEnrolledCourse,
 };

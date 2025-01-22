@@ -13,7 +13,6 @@ const assignFacultiesIntoDB = async (
   if (!isCourseExist || isCourseExist.isDeleted) {
     throw new AppError(StatusCodes.NOT_FOUND, 'this course does not exist');
   }
-
   if (payload?.faculties && payload?.faculties.length > 0) {
     const { faculties } = payload;
     for (const faculty of faculties) {
@@ -26,7 +25,6 @@ const assignFacultiesIntoDB = async (
       }
     }
   }
-
   const result = await CourseFaculty.findByIdAndUpdate(
     id,
     {
@@ -41,6 +39,16 @@ const assignFacultiesIntoDB = async (
   return result;
 };
 
+const getFacultyWithCourse = async (id: string) => {
+  const result = await CourseFaculty.findOne({ course: id })
+    .select({
+      faculties: 1,
+      _id: 0,
+    })
+    .populate('faculties');
+  return result;
+};
+
 const removeFaculties = async (
   id: string,
   payload: Partial<TCourseFaculty>
@@ -50,7 +58,6 @@ const removeFaculties = async (
   if (!isCourseFAcultyExist) {
     throw new AppError(StatusCodes.NOT_FOUND, 'data not found');
   }
-
   // check if the faculty length comes from body is not larger than the faculty length in the database
   if (
     payload?.faculties &&
@@ -58,7 +65,6 @@ const removeFaculties = async (
   ) {
     throw new AppError(StatusCodes.BAD_REQUEST, 'operation failed');
   }
-
   // chech if the faculty element comes from he body is included in the faculty in the database
   const isInclude = payload.faculties?.every((element) =>
     isCourseFAcultyExist.faculties.includes(element)
@@ -69,7 +75,6 @@ const removeFaculties = async (
       'the faculty you want to remove isn`t included in the course yet'
     );
   }
-
   // final result
   const result = await CourseFaculty.findByIdAndUpdate(
     id,
@@ -86,4 +91,5 @@ const removeFaculties = async (
 export const courseFacultyService = {
   assignFacultiesIntoDB,
   removeFaculties,
+  getFacultyWithCourse,
 };

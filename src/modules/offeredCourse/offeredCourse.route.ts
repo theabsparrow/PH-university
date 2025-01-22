@@ -14,12 +14,7 @@ router.post(
 );
 router.get(
   '/',
-  auth(
-    USER_ROLE.admin,
-    USER_ROLE.superAdmin,
-    USER_ROLE.faculty,
-    USER_ROLE.student
-  ),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin, USER_ROLE.faculty),
   offeredCourseController.getAllOfferedCourse
 );
 router.get(
@@ -32,7 +27,11 @@ router.get(
   ),
   offeredCourseController.getSingleOfferedCourse
 );
-
+router.get(
+  '/my-offered-course',
+  auth(USER_ROLE.student),
+  offeredCourseController.getMyOfferedCourse
+);
 router.patch(
   '/:id',
   auth(USER_ROLE.admin, USER_ROLE.superAdmin),

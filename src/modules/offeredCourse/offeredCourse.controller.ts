@@ -46,6 +46,20 @@ const getSingleOfferedCourse = catchAsync(
   }
 );
 
+const getMyOfferedCourse = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user;
+    const { userID } = user;
+    const result = await offeredCourseService.getMyOfferedCourse(userID);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'my offered courses are retrived successfully',
+      data: result,
+    });
+  }
+);
+
 const updateOfferedCourse = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
@@ -78,4 +92,5 @@ export const offeredCourseController = {
   updateOfferedCourse,
   deleteOfferedCourse,
   getSingleOfferedCourse,
+  getMyOfferedCourse,
 };

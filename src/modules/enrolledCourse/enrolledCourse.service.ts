@@ -12,6 +12,7 @@ import {
   calculateGradeAndPoints,
   getOfferCourse,
 } from './enrolledCourse.utills';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const createEnrolledCourse = async (
   payload: TEnrolledCourse,
@@ -140,6 +141,34 @@ const createEnrolledCourse = async (
   }
 };
 
+const getMyEnrolledCourse = async (
+  id: string,
+  payload: Record<string, unknown>
+) => {
+  const studentIDExists = await Student.findOne({ id: id }).select({ _id: 1 });
+  if (!studentIDExists) {
+    throw new AppError(StatusCodes.FORBIDDEN, 'forbidden access');
+  }
+  const studentID = studentIDExists?._id;
+  const enrolledCourseQuery = new QueryBuilder(
+    EnrolledCourse.find({ student: studentID }).populate('semisterRegistration academicSemister'),
+    payload
+  )
+    .filter()
+    .sort()
+    .paginateQuery()
+    .fields();
+  const result = await enrolledCourseQuery.modelQuery;
+  if (!result.length) {
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      'you didn`t enroll any course yet'
+    );
+  }
+  const meta = await enrolledCourseQuery.countTotal();
+  return { meta, result };
+};
+
 const updateEnrolledCourseMarks = async (
   payload: Partial<TEnrolledCourse>,
   enrolledCourseID: Types.ObjectId
@@ -230,4 +259,5 @@ const updateEnrolledCourseMarks = async (
 export const enrolledCourseService = {
   createEnrolledCourse,
   updateEnrolledCourseMarks,
+  getMyEnrolledCourse,
 };
