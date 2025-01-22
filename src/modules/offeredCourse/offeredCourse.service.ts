@@ -100,9 +100,170 @@ const getAllOfferedCourse = async (query: Record<string, unknown>) => {
   return result;
 };
 
-const getMyOfferedCourse = async (id: string) => {
+const getMyOfferedCourse = async (
+  id: string,
+  query: Record<string, unknown>
+) => {
+  // check if the student exists
   const isStudentExists = await Student.findOne({ id: id });
-  return isStudentExists;
+  if (!isStudentExists) {
+    throw new AppError(StatusCodes.NOT_FOUND, ' student not found');
+  }
+  // get the current ongoing semister
+  const currentOngoingRegisterSemister = await SemisterRegistration.findOne({
+    status: 'ONGOING',
+  });
+  if (!currentOngoingRegisterSemister) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'No ongoing semister right now');
+  }
+  const page = Number(query?.page) || 1;
+  const limit = Number(query?.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const aggrigateQuery = [
+    {
+      $match: {
+        semisterRegistration: currentOngoingRegisterSemister?._id,
+        academicFaculty: isStudentExists?.academicFaculty,
+        academicDepartment: isStudentExists?.academicDepartment,
+      },
+    },
+    {
+      $lookup: {
+        from: 'courses',
+        localField: 'course',
+        foreignField: '_id',
+        as: 'course',
+      },
+    },
+    {
+      $unwind: '$course',
+    },
+    {
+      $lookup: {
+        from: 'enrolledcourses',
+        let: {
+          currentOngoingRegisterSemister: currentOngoingRegisterSemister._id,
+          currentStudentID: isStudentExists._id,
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  {
+                    $eq: [
+                      '$semisterRegistration',
+                      '$$currentOngoingRegisterSemister',
+                    ],
+                  },
+                  {
+                    $eq: ['$student', '$$currentStudentID'],
+                  },
+                  {
+                    $eq: ['$isEnrolled', true],
+                  },
+                ],
+              },
+            },
+          },
+        ],
+        as: 'enrolledCourses',
+      },
+    },
+    {
+      $lookup: {
+        from: 'enrolledcourses',
+        let: {
+          currentStudent: isStudentExists._id,
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  {
+                    $eq: ['$student', '$$currentStudent'],
+                  },
+                  {
+                    $eq: ['$isCompleted', true],
+                  },
+                ],
+              },
+            },
+          },
+        ],
+        as: 'completedCourses',
+      },
+    },
+    {
+      $addFields: {
+        completedCourseIDs: {
+          $map: {
+            input: '$completedCourses',
+            as: 'completed',
+            in: '$$completed.course',
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        isPreRequisiteFulfiled: {
+          $or: [
+            {
+              $eq: ['$course.preRequisite', []],
+            },
+            {
+              $setIsSubset: [
+                '$course.preRequisite.course',
+                '$completedCourseIDs',
+              ],
+            },
+          ],
+        },
+        isAlreadyEnrolled: {
+          $in: [
+            '$course._id',
+            {
+              $map: {
+                input: '$enrolledCourses',
+                as: 'enroll',
+                in: '$$enroll.course',
+              },
+            },
+          ],
+        },
+      },
+    },
+    {
+      $match: {
+        isAlreadyEnrolled: false,
+        isPreRequisiteFulfiled: true,
+      },
+    },
+  ];
+  const paginateQuery = [
+    {
+      $skip: skip,
+    },
+    {
+      $limit: limit,
+    },
+  ];
+  const result = await OfferedCourse.aggregate([...aggrigateQuery, ...paginateQuery]);
+  const total = (await OfferedCourse.aggregate(aggrigateQuery)).length
+
+  const totalPage = Math.ceil(total / limit);
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+      totalPage
+    },
+    result
+  };
 };
 
 // get a single offered course

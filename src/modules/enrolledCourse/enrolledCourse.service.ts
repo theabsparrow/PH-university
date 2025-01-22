@@ -240,10 +240,10 @@ const updateEnrolledCourseMarks = async (
 
   if (courseMarks?.finalTerm) {
     const totalMarks =
-      Math.ceil(classTest1 * 0.1 || courseMarks?.classTest1 * 0.1) +
-      Math.ceil(midTerm * 0.3 || courseMarks?.midTerm * 0.3) +
-      Math.ceil(classTest2 * 0.1 || courseMarks?.classTest2 * 0.1) +
-      Math.ceil(finalTerm * 0.5 || courseMarks?.finalTerm * 0.5);
+      Math.ceil(classTest1 || courseMarks?.classTest1) +
+      Math.ceil(midTerm || courseMarks?.midTerm ) +
+      Math.ceil(classTest2 || courseMarks?.classTest2) +
+      Math.ceil(finalTerm || courseMarks?.finalTerm );
     const result = calculateGradeAndPoints(totalMarks);
     modifiedMarksData.grade = result?.grade;
     modifiedMarksData.gradePoints = result?.gradePoints;
