@@ -26,8 +26,11 @@ const getAllAcademicFaculty = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,
-      message: 'Academic faculties are retrived successfully',
-      data: result || 'no data found',
+      message: result?.result
+        ? 'Academic faculties are retrived successfully'
+        : 'no data found',
+      meta: result?.meta,
+      data: result?.result,
     });
   }
 );

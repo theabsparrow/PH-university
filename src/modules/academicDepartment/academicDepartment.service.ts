@@ -21,7 +21,8 @@ const getAllAcademicDepartment = async (query: Record<string, unknown>) => {
     .fields();
 
   const result = await academicDepartmentQuery.modelQuery;
-  return result;
+  const meta = await academicDepartmentQuery.countTotal();
+  return { meta, result };
 };
 
 const getSingleAcademicDepartment = async (id: string) => {

@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NextFunction, Request, Response } from 'express';
+import { CookieOptions, NextFunction, Request, Response } from 'express';
 import catchAsync from '../../utills/catchAsync';
 import { authService } from './auth.service';
 import sendResponse from '../../utills/sendResponse';
@@ -12,10 +12,14 @@ const userLogin = catchAsync(
     const payload = req.body;
     const result = await authService.userLogin(payload);
     const { refreshToken, accessToken, needsPasswordChange } = result;
-    const cookieOptions = {
+
+    const cookieOptions: CookieOptions = {
       secure: config.NODE_ENV === 'production',
       httpOnly: true,
+      sameSite: 'none',
+      maxAge: 1000 * 60 * 60 * 24 * 365,
     };
+
     res.cookie('refreshToken', refreshToken, cookieOptions);
     sendResponse(res, {
       success: true,

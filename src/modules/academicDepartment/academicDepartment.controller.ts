@@ -30,8 +30,11 @@ const getAllAcademicDepartment = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,
-      message: 'Academic Departments retrived successfully',
-      data: result || 'no data found',
+      message: result?.result
+        ? 'Academic Departments retrived successfully'
+        : 'no data found',
+      meta: result?.meta,
+      data: result?.result,
     });
   }
 );

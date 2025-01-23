@@ -13,8 +13,9 @@ const getAllStudent = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,
-      message: 'students are retrived successfully',
-      data: result || 'no data found',
+      message: result?.result.length ? 'students are retrived successfully' : 'no data found',
+      meta: result?.meta,
+      data: result?.result,
     });
   }
 );

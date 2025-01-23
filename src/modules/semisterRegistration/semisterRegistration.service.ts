@@ -35,7 +35,8 @@ const getAllRegisteredSemister = async (query: Record<string, unknown>) => {
     .paginateQuery()
     .fields();
   const result = await semisterRegistrtionQuery.modelQuery;
-  return result;
+  const meta = await semisterRegistrtionQuery.countTotal();
+  return { meta, result };
 };
 
 const getSingleRegisteredSemister = async (id: string) => {

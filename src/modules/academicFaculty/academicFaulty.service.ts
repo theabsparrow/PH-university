@@ -17,7 +17,8 @@ const getAllAcademicFaculty = async (query: Record<string, unknown>) => {
     .sort();
 
   const result = await academicFacultyQuery.modelQuery;
-  return result;
+  const meta = await academicFacultyQuery.countTotal();
+  return { meta, result };
 };
 
 const getSingleAcademicFaculty = async (id: string) => {

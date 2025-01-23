@@ -27,8 +27,11 @@ const getAllOfferedCourse = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,
-      message: 'offered coursees are retrived successfully',
-      data: result,
+      message: result?.result.length
+        ? 'offered coursees are retrived successfully'
+        : 'no data found',
+      meta: result?.meta,
+      data: result?.result,
     });
   }
 );
@@ -49,14 +52,17 @@ const getSingleOfferedCourse = catchAsync(
 const getMyOfferedCourse = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const user = req.user;
-    const query = req.query
+    const query = req.query;
     const { userID } = user;
     const result = await offeredCourseService.getMyOfferedCourse(userID, query);
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,
-      message: 'my offered courses are retrived successfully',
-      data: result,
+      message: result?.result.length
+        ? 'my offered courses are retrived successfully'
+        : 'no data found',
+      meta: result?.meta,
+      data: result?.result,
     });
   }
 );

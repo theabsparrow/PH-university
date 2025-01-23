@@ -23,7 +23,8 @@ const getAllAcademySemister = async (query: Record<string, unknown>) => {
     .sort()
     .fields();
   const result = await academicSemisterQuery.modelQuery;
-  return result;
+  const meta = await academicSemisterQuery.countTotal();
+  return { meta, result };
 };
 
 const getASingleAcademySemister = async (id: string) => {

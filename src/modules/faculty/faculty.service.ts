@@ -13,12 +13,7 @@ const getAllFaculty = async (query: Record<string, unknown>) => {
   const facultyQuery = new QueryBuilder(
     Faculty.find()
       .populate('user')
-      .populate({
-        path: 'academicDepartment',
-        populate: {
-          path: 'academicFaculty',
-        },
-      }),
+      .populate('academicDepartment academicFaculty'),
     query
   )
     .search(SearchableFields)
@@ -27,7 +22,8 @@ const getAllFaculty = async (query: Record<string, unknown>) => {
     .paginateQuery()
     .fields();
   const result = await facultyQuery.modelQuery;
-  return result;
+  const meta = await facultyQuery.countTotal();
+  return { meta, result };
 };
 
 const getSingleFaculty = async (id: string) => {

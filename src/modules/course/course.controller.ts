@@ -26,8 +26,9 @@ const getAllCourses = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,
-      message: 'courses are retrived successfully',
-      data: result,
+      message:result?.result? 'courses are retrived successfully': 'no data found',
+      meta: result?.meta,
+      data: result?.result,
     });
   }
 );

@@ -30,8 +30,9 @@ const getAllRegisteredSemister = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,
-      message: 'all registered semisters are retrived successfully',
-      data: result,
+      message: result?.result.length? 'all registered semisters are retrived successfully': 'no data found',
+      meta: result?.meta,
+      data: result?.result,
     });
   }
 );

@@ -97,7 +97,8 @@ const getAllOfferedCourse = async (query: Record<string, unknown>) => {
     .paginateQuery()
     .fields();
   const result = await allOfferedCourseQuery.modelQuery;
-  return result;
+  const meta = await allOfferedCourseQuery.countTotal();
+  return {meta,result};
 };
 
 const getMyOfferedCourse = async (

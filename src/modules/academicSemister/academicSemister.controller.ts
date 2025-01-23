@@ -26,8 +26,11 @@ const getAllAcademicSemister = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.CREATED,
-      message: 'All academic semisters are retrived successfully',
-      data: result || 'no data found',
+      message: result?.result
+        ? 'All academic semisters are retrived successfully'
+        : 'no data found',
+      meta: result?.meta,
+      data: result?.result,
     });
   }
 );

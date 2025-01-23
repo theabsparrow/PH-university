@@ -13,8 +13,9 @@ const getAllAdmin = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,
-      message: 'Admins retrived successfully',
-      data: result,
+      message:result?.result? 'Admins retrived successfully': 'no data found',
+      meta: result?.meta,
+      data: result?.result,
     });
   }
 );

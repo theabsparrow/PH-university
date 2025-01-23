@@ -37,8 +37,9 @@ const getMyEnrolledCourse = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.CREATED,
-      message: 'my enrolled course retrived successfully',
-      data: result,
+      message:result?.result? 'my enrolled course retrived successfully': 'no data found',
+      meta: result?.meta,
+      data: result?.result,
     });
   }
 );

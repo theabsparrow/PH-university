@@ -17,7 +17,8 @@ const getAllAdmin = async (query: Record<string, unknown>) => {
     .paginateQuery()
     .fields();
   const result = await AdminQuery.modelQuery;
-  return result;
+  const meta = await AdminQuery.countTotal()
+  return {meta,result};
 };
 
 const getSingleAdmin = async (id: string) => {

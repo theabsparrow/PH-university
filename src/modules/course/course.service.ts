@@ -24,7 +24,8 @@ const getAllCourse = async (query: Record<string, unknown>) => {
     .fields();
 
   const result = await courseQuery.modelQuery;
-  return result;
+  const meta = await courseQuery.countTotal();
+  return {meta,result};
 };
 
 const getASingleCourse = async (id: string) => {

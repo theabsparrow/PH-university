@@ -14,8 +14,9 @@ const getAllFaculty = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,
-      message: 'Faculties retrived successfully',
-      data: result,
+      message: result?.result ? 'Faculties retrived successfully' : 'no data found',
+      meta: result?.meta,
+      data: result?.result,
     });
   }
 );
